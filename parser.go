@@ -47,8 +47,12 @@ func (p *Parser) Parse() (interface{}, error) {
 			// Close parenthesis
 		} else if t == ")" {
 			return "", fmt.Errorf("List was closed but not opened")
-			// Symbol
+			// Env
+		} else if val, ok := Env[t]; ok {
+			p.values = append(p.values, val)
+			pos++
 		} else {
+			// Symbol
 			p.values = append(p.values, t)
 			pos++
 		}
@@ -75,7 +79,7 @@ func (p *Parser) Eval() (interface{}, error) {
 		// Array
 	} else if _, ok := t.([]interface{}); ok {
 		return t, nil
-		// Add
+		// If
 	} else if t == "if" {
 		if p.values[1] == "true" && len(p.values) > 2 {
 			return p.values[2], nil
@@ -83,9 +87,9 @@ func (p *Parser) Eval() (interface{}, error) {
 			return p.values[3], nil
 		}
 		return "nil", nil
-		// Symbol
-	} else if val, ok := Env[t.(string)]; ok {
-		return val, nil
+		// Begin
+	} else if t == "begin" {
+		return p.values[len(p.values)-1], nil
 		// Add
 	} else if t == "+" {
 		var sum int
