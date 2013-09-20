@@ -4,16 +4,20 @@ import "testing"
 
 func TestParse(t *testing.T) {
 	var tests = map[string]string{
-		"42":      "42",
-		"(42)":    "42",
-		"((42))":  "42",
-		"(42 13)": "42",
+		"42":              "42",
+		"(42)":            "42",
+		"((42))":          "42",
+		"(42 13)":         "42",
+		"(+ 42 13)":       "55",
+		"(+ (+ 1 2 3) 4)": "10",
 	}
 
 	for in, out := range tests {
 		tokens := Tokenize(in)
-		x, _ := NewParser(tokens).Parse()
-		if x != out {
+		x, err := NewParser(tokens).Parse()
+		if err != nil {
+			t.Error(err)
+		} else if x != out {
 			t.Errorf("Parse('%v') = '%v', want '%v'", in, x, out)
 		}
 	}
