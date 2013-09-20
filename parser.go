@@ -23,16 +23,14 @@ func (p *Parser) Parse() (interface{}, error) {
 	var pos int
 	for pos < len(p.tokens) {
 		t := p.tokens[pos]
-		// Number
-		if m, _ := regexp.MatchString("^\\d+$", t); m {
+		if m, _ := regexp.MatchString("^\\d+$", t); m { // Number
 			i, err := strconv.Atoi(t)
 			if err != nil {
 				fmt.Errorf("Failed to convert number: %v", t)
 			}
 			p.values = append(p.values, i)
 			pos++
-			// Open parenthesis
-		} else if t == "(" {
+		} else if t == "(" { // Open parenthesis
 			start := pos + 1
 			end, err := p.findEnd(start)
 			if err != nil {
@@ -44,15 +42,13 @@ func (p *Parser) Parse() (interface{}, error) {
 			}
 			p.values = append(p.values, value)
 			pos = end + 1
-			// Close parenthesis
-		} else if t == ")" {
+		} else if t == ")" { // Close parenthesis
 			return "", fmt.Errorf("List was closed but not opened")
 			// Env
 		} else if val, ok := Env[t]; ok {
 			p.values = append(p.values, val)
 			pos++
-		} else {
-			// Symbol
+		} else { // Symbol
 			p.values = append(p.values, t)
 			pos++
 		}
@@ -62,36 +58,29 @@ func (p *Parser) Parse() (interface{}, error) {
 
 func (p *Parser) Eval() (interface{}, error) {
 	t := p.values[0]
-	// (quote exp)
-	if t == "quote" {
+	if t == "quote" { // (quote exp)
 		return p.values[1:], nil
-		// Define
-	} else if t == "define" {
+	} else if t == "define" { // Define
 		if len(p.values) == 3 {
 			Env[p.values[1].(string)] = p.values[2]
 			return p.values[2], nil
 		} else {
 			return nil, fmt.Errorf("Define require two parameters")
 		}
-		// Int
-	} else if _, ok := t.(int); ok {
+	} else if _, ok := t.(int); ok { // Int
 		return t, nil
-		// Array
-	} else if _, ok := t.([]interface{}); ok {
+	} else if _, ok := t.([]interface{}); ok { // Array
 		return t, nil
-		// If
-	} else if t == "if" {
+	} else if t == "if" { // If
 		if p.values[1] == "true" && len(p.values) > 2 {
 			return p.values[2], nil
 		} else if len(p.values) > 3 {
 			return p.values[3], nil
 		}
 		return "nil", nil
-		// Begin
-	} else if t == "begin" {
+	} else if t == "begin" { // Begin
 		return p.values[len(p.values)-1], nil
-		// Add
-	} else if t == "+" {
+	} else if t == "+" { // Addition
 		var sum int
 		for _, i := range p.values[1:] {
 			v, ok := i.(int)
