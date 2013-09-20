@@ -1,15 +1,17 @@
 package lisp
 
 import "testing"
+import "fmt"
 
 func TestParse(t *testing.T) {
-	var tests = map[string]string{
+	var tests = map[string]interface{}{
 		"42":              "42",
 		"(42)":            "42",
 		"((42))":          "42",
 		"(42 13)":         "42",
 		"(+ 42 13)":       "55",
 		"(+ (+ 1 2 3) 4)": "10",
+		"(quote 1 2 3)":   "[1 2 3]",
 	}
 
 	for in, out := range tests {
@@ -17,8 +19,8 @@ func TestParse(t *testing.T) {
 		x, err := NewParser(tokens).Parse()
 		if err != nil {
 			t.Error(err)
-		} else if x != out {
-			t.Errorf("Parse('%v') = '%v', want '%v'", in, x, out)
+		} else if fmt.Sprintf("%v", x) != out {
+			t.Errorf("Parsing \"%v\" gives \"%v\", want \"%v\"", in, x, out)
 		}
 	}
 }

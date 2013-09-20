@@ -6,20 +6,28 @@ import "strconv"
 
 type Parser struct {
 	tokens []string
-	values []string
+	values []interface{}
 }
 
 func NewParser(tokens []string) *Parser {
 	return &Parser{tokens: tokens}
 }
 
-func (p *Parser) Parse() (string, error) {
-	var i int
-	for i < len(p.tokens) {
-		t := p.tokens[i]
-		// BEGIN PARENTHESIS
-		if t == "(" {
-			start := i + 1
+func (p *Parser) Parse() (interface{}, error) {
+	var pos int
+	for pos < len(p.tokens) {
+		t := p.tokens[pos]
+		// Number
+		if m, _ := regexp.MatchString("^\\d+$", t); m {
+			i, err := strconv.Atoi(t)
+			if err != nil {
+				fmt.Errorf("Failed to convert number: %v", t)
+			}
+			p.values = append(p.values, i)
+			pos++
+		// Open parenthesis
+		} else if t == "(" {
+			start := pos + 1
 			end, err := p.findEnd(start)
 			if err != nil {
 				return "", err
@@ -29,34 +37,37 @@ func (p *Parser) Parse() (string, error) {
 				return "", err
 			}
 			p.values = append(p.values, value)
-			i = end + 1
-			// END PARENTHESIS
+			pos = end + 1
+		// Close parenthesis
 		} else if t == ")" {
-			return "", fmt.Errorf("%v: List was closed but not opened", i)
+			return "", fmt.Errorf("List was closed but not opened")
+		// Symbol
 		} else {
-			i++
 			p.values = append(p.values, t)
+			pos++
 		}
 	}
 	return p.Eval()
 }
 
-func (p *Parser) Eval() (string, error) {
+func (p *Parser) Eval() (interface{}, error) {
 	t := p.values[0]
-	if m, _ := regexp.MatchString("^\\d+$", t); m {
-		return t, nil
+	if t == "quote" {
+		return p.values[1:], nil
 	} else if t == "+" {
 		var sum int
-		for _, val := range p.values[1:] {
-			i, err := strconv.Atoi(val)
-			if err != nil {
-				fmt.Errorf("Can only add numbers: %v", val)
+		for _, i := range p.values[1:] {
+			v, ok := i.(int)
+			if ok {
+				sum += int(v)
+			} else {
+				return nil, fmt.Errorf("Cannot only add numbers: %v", i)
 			}
-			sum += i
 		}
-		return strconv.Itoa(sum), nil
+		return sum, nil
 	} else {
-		return "", fmt.Errorf("Unknown symbol: %v", t)
+		return t, nil
+		//return "", fmt.Errorf("Unknown symbol: %v", t)
 	}
 }
 
