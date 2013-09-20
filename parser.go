@@ -9,6 +9,12 @@ type Parser struct {
 	values []interface{}
 }
 
+var Env map[string]interface{}
+
+func init() {
+	Env = make(map[string]interface{})
+}
+
 func NewParser(tokens []string) *Parser {
 	return &Parser{tokens: tokens}
 }
@@ -25,7 +31,7 @@ func (p *Parser) Parse() (interface{}, error) {
 			}
 			p.values = append(p.values, i)
 			pos++
-		// Open parenthesis
+			// Open parenthesis
 		} else if t == "(" {
 			start := pos + 1
 			end, err := p.findEnd(start)
@@ -38,10 +44,10 @@ func (p *Parser) Parse() (interface{}, error) {
 			}
 			p.values = append(p.values, value)
 			pos = end + 1
-		// Close parenthesis
+			// Close parenthesis
 		} else if t == ")" {
 			return "", fmt.Errorf("List was closed but not opened")
-		// Symbol
+			// Symbol
 		} else {
 			p.values = append(p.values, t)
 			pos++
@@ -52,8 +58,35 @@ func (p *Parser) Parse() (interface{}, error) {
 
 func (p *Parser) Eval() (interface{}, error) {
 	t := p.values[0]
+	// (quote exp)
 	if t == "quote" {
 		return p.values[1:], nil
+		// Define
+	} else if t == "define" {
+		if len(p.values) == 3 {
+			Env[p.values[1].(string)] = p.values[2]
+			return p.values[2], nil
+		} else {
+			return nil, fmt.Errorf("Define require two parameters")
+		}
+		// Int
+	} else if _, ok := t.(int); ok {
+		return t, nil
+		// Array
+	} else if _, ok := t.([]interface{}); ok {
+		return t, nil
+		// Add
+	} else if t == "if" {
+		if p.values[1] == "true" && len(p.values) > 2 {
+			return p.values[2], nil
+		} else if len(p.values) > 3 {
+			return p.values[3], nil
+		}
+		return "nil", nil
+		// Symbol
+	} else if val, ok := Env[t.(string)]; ok {
+		return val, nil
+		// Add
 	} else if t == "+" {
 		var sum int
 		for _, i := range p.values[1:] {
@@ -65,10 +98,9 @@ func (p *Parser) Eval() (interface{}, error) {
 			}
 		}
 		return sum, nil
-	} else {
-		return t, nil
-		//return "", fmt.Errorf("Unknown symbol: %v", t)
 	}
+	// Unknown
+	return "", fmt.Errorf("Unknown symbol: %v", t)
 }
 
 func (p *Parser) findEnd(start int) (int, error) {
