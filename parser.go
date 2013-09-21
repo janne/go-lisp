@@ -4,9 +4,19 @@ import "regexp"
 import "fmt"
 import "strconv"
 
-func Parse(tokens []string) ([]interface{}, error) {
+type Sexp []interface{}
+
+func (s Sexp) String() string {
+	if len(s) == 1 {
+		return fmt.Sprintf("%v", s[0])
+	} else {
+		return fmt.Sprintf("%v", []interface{}(s))
+	}
+}
+
+func Parse(tokens []string) (Sexp, error) {
 	var pos int
-	values := make([]interface{}, 0)
+	values := make(Sexp, 0)
 	for pos < len(tokens) {
 		t := tokens[pos]
 		if m, _ := regexp.MatchString("^\\d+$", t); m { // Number

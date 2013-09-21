@@ -5,19 +5,20 @@ import "fmt"
 
 func TestEval(t *testing.T) {
 	var tests = map[string]interface{}{
-		"42":                                       "42",
-		"(42)":                                     "42",
-		"((42))":                                   "42",
-		"(+ 42 13)":                                "55",
-		"(+ (+ 1 2 3) 4)":                          "10",
-		"(quote 1 2 3)":                            "[1 2 3]",
-		"(if true (+ 1 1) 3)":                      "2",
-		"(if false 42 1)":                          "1",
-		"(if false 42)":                            "nil",
-		"(define r 3)":                             "3",
-		"(begin 5 (+ 3 4))":                        "7",
-		"(begin (define p 3) (+ 39 p))":            "42",
-		"(begin (define q 3) (set! q 4) (+ 39 q))": "43",
+		"42":                                      "42",
+		"(42)":                                    "42",
+		"((42))":                                  "42",
+		"(+ 42 13)":                               "55",
+		"(+ (+ 1 2 3) 4)":                         "10",
+		"(quote 1 2 3)":                           "[1 2 3]",
+		"(quote 1 (+ 1 2) 3)":                     "[1 [+ 1 2] 3]",
+		"(if true (+ 1 1) 3)":                     "2",
+		"(if false 42 1)":                         "1",
+		"(if false 42)":                           "nil",
+		"(define r 3)":                            "3",
+		"(begin 5 (+ 3 4))":                       "7",
+		"(begin (define p 3) (+ 39 p))":           "42",
+		"(begin (define p 3) (set! p 4) (+ 1 p))": "5",
 	}
 
 	for in, out := range tests {

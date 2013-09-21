@@ -9,20 +9,19 @@ func init() {
 }
 
 func Eval(expr interface{}) (interface{}, error) {
-	fmt.Printf("EVAL: %v\n", expr)
 	switch expr.(type) {
 	case int: // Int
 		return expr, nil
-	case string:
+	case string: // Symbol
 		if val, ok := Env[expr.(string)]; ok {
 			return val, nil
 		} else {
 			return nil, fmt.Errorf("Unknown symbol: %v", expr)
 		}
-	case []interface{}:
-		tokens := expr.([]interface{})
+	case Sexp:
+		tokens := expr.(Sexp)
 		t := tokens[0]
-		if _, ok := t.([]interface{}); ok {
+		if _, ok := t.(Sexp); ok {
 			return Eval(t)
 		} else if t == "quote" { // Quote
 			return tokens[1:], nil
@@ -69,6 +68,8 @@ func Eval(expr interface{}) (interface{}, error) {
 				}
 			}
 			return sum, nil
+		} else {
+			return Eval(t)
 		}
 	}
 	return nil, fmt.Errorf("Unknown data type: %v", expr)
