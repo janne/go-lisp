@@ -21,88 +21,79 @@ func Execute(line string) (string, error) {
 	return fmt.Sprintf("%v", evaled), nil
 }
 
-func Eval(expr interface{}) (interface{}, error) {
+func Eval(expr interface{}) (val interface{}, err error) {
 	switch expr.(type) {
 	case int: // Int
-		return expr, nil
+		val = expr
 	case string: // Symbol
 		sym := expr.(string)
-		if val, ok := Env[sym]; ok {
-			return val, nil
+		if v, ok := Env[sym]; ok {
+			val = v
 		} else if sym == "true" || sym == "false" {
-			return sym, nil
+			val = sym
 		} else {
-			return nil, fmt.Errorf("Unknown symbol: %v", expr)
+			err = fmt.Errorf("Unknown symbol: %v", expr)
 		}
 	case Sexp:
 		tokens := expr.(Sexp)
 		t := tokens[0]
 		if _, ok := t.(Sexp); ok {
-			return Eval(t)
+			val, err = Eval(t)
 		} else if t == "quote" { // Quote
-			return tokens[1:], nil
+			val = tokens[1:]
 		} else if t == "define" { // Define
-			var r interface{}
-			var err error
 			if len(tokens) > 2 {
-				r, err = Eval(tokens[2])
-				if err != nil {
-					return nil, err
-				}
+				val, err = Eval(tokens[2])
 			}
-			Env[tokens[1].(string)] = r
-			return r, nil
+			if err == nil && len(tokens) > 1 {
+				Env[tokens[1].(string)] = val
+			}
 		} else if t == "set!" { // Set!
 			key := tokens[1].(string)
 			if _, ok := Env[key]; ok {
-				r, err := Eval(tokens[2])
-				if err != nil {
-					return nil, err
+				val, err = Eval(tokens[2])
+				if err == nil {
+					Env[key] = val
 				}
-				Env[key] = r
-				return r, nil
 			} else {
-				return nil, fmt.Errorf("Can only set! variable that is previously defined")
+				err = fmt.Errorf("Can only set! variable that is previously defined")
 			}
 		} else if t == "if" { // If
 			r, err := Eval(tokens[1])
-			if err != nil {
-				return nil, err
-			}
-			if r != "false" && len(tokens) > 2 {
-				return Eval(tokens[2])
-			} else if len(tokens) > 3 {
-				return Eval(tokens[3])
-			}
-			return "nil", nil
-		} else if t == "begin" { // Begin
-			var r interface{}
-			var err error
-			for _, val := range tokens[1:] {
-				r, err = Eval(val)
-				if err != nil {
-					return nil, err
+			if err == nil {
+				if r != "false" && len(tokens) > 2 {
+					val, err = Eval(tokens[2])
+				} else if len(tokens) > 3 {
+					val, err = Eval(tokens[3])
 				}
 			}
-			return r, nil
+		} else if t == "begin" { // Begin
+			for _, val = range tokens[1:] {
+				val, err = Eval(val)
+				if err != nil {
+					break
+				}
+			}
 		} else if t == "+" { // Addition
 			var sum int
 			for _, i := range tokens[1:] {
 				j, err := Eval(i)
-				if err != nil {
-					return nil, err
-				}
-				v, ok := j.(int)
-				if ok {
-					sum += int(v)
-				} else {
-					return nil, fmt.Errorf("Cannot only add numbers: %v", i)
+				if err == nil {
+					v, ok := j.(int)
+					if ok {
+						sum += int(v)
+					} else {
+						err = fmt.Errorf("Cannot only add numbers: %v", i)
+						break
+					}
 				}
 			}
-			return sum, nil
+			val = sum
 		} else {
 			return Eval(t)
 		}
+	default:
+		err = fmt.Errorf("Unknown data type: %v", expr)
 	}
-	return nil, fmt.Errorf("Unknown data type: %v", expr)
+	return
 }

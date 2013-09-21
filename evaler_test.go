@@ -14,7 +14,7 @@ func TestEval(t *testing.T) {
 		"(quote 1 (+ 1 2) 3)":                     "[1 [+ 1 2] 3]",
 		"(if true (+ 1 1) 3)":                     "2",
 		"(if false 42 1)":                         "1",
-		"(if false 42)":                           "nil",
+		"(if false 42)":                           "<nil>",
 		"(define r 3)":                            "3",
 		"(begin 5 (+ 3 4))":                       "7",
 		"(begin (define p 3) (+ 39 p))":           "42",
