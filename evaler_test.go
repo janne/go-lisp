@@ -15,6 +15,7 @@ func TestEval(t *testing.T) {
 		"(if true (+ 1 1) 3)":                     "2",
 		"(if false 42 1)":                         "1",
 		"(if false 42)":                           "<nil>",
+		"(begin (define x) (if x 1 2))":           "2",
 		"(define r 3)":                            "3",
 		"(begin 5 (+ 3 4))":                       "7",
 		"(begin (define p 3) (+ 39 p))":           "42",
@@ -41,7 +42,7 @@ func TestEval(t *testing.T) {
 func TestEvalFailures(t *testing.T) {
 	var tests = []string{
 		"hello",
-		"(set! x 42)",
+		"(set! undefined 42)",
 	}
 
 	for _, in := range tests {

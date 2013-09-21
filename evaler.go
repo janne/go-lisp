@@ -61,7 +61,7 @@ func Eval(expr interface{}) (val interface{}, err error) {
 		} else if t == "if" { // If
 			r, err := Eval(tokens[1])
 			if err == nil {
-				if r != "false" && len(tokens) > 2 {
+				if r != "false" && r != nil && len(tokens) > 2 {
 					val, err = Eval(tokens[2])
 				} else if len(tokens) > 3 {
 					val, err = Eval(tokens[3])
