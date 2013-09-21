@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	fmt.Printf("Hello, world!\n")
+	fmt.Printf("Welcome to the Lisp REPL\n")
 	reader := bufio.NewReader(os.Stdin)
 	for {
 		fmt.Printf("> ")
