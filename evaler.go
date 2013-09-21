@@ -4,6 +4,23 @@ import "fmt"
 
 var Env map[string]interface{}
 
+type Proc struct {
+	Params Sexp
+	Body   interface{}
+}
+
+func (p Proc) Call(params Sexp) (val interface{}, err error) {
+	if len(p.Params) == len(params) {
+		for i, name := range p.Params {
+			Env[name.(string)] = params[i]
+		}
+		val, err = Eval(p.Body)
+	} else {
+		err = fmt.Errorf("Number of parameters mismatch, %v for %v", len(params), len(p.Params))
+	}
+	return
+}
+
 func init() {
 	Env = make(map[string]interface{})
 }
@@ -40,6 +57,9 @@ func Eval(expr interface{}) (val interface{}, err error) {
 			t := tokens[0]
 			if _, ok := t.(Sexp); ok {
 				val, err = Eval(t)
+				if p, ok := val.(Proc); ok && len(tokens) > 1 {
+					val, err = p.Call(tokens[1:])
+				}
 			} else if t == "quote" { // Quote
 				val = tokens[1:]
 			} else if t == "define" { // Define
@@ -75,6 +95,13 @@ func Eval(expr interface{}) (val interface{}, err error) {
 						break
 					}
 				}
+			} else if t == "lambda" {
+				if len(tokens) > 2 {
+					params := tokens[1].(Sexp)
+					val = Proc{params, tokens[2:]}
+				} else {
+					err = fmt.Errorf("Missing parameters to lambda")
+				}
 			} else if t == "+" { // Addition
 				var sum int
 				for _, i := range tokens[1:] {
@@ -91,7 +118,10 @@ func Eval(expr interface{}) (val interface{}, err error) {
 				}
 				val = sum
 			} else {
-				return Eval(t)
+				val, err = Eval(t)
+				if p, ok := val.(Proc); ok && len(tokens) > 1 {
+					val, err = p.Call(tokens[1:])
+				}
 			}
 		}
 	default:
