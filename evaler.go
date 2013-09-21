@@ -8,6 +8,19 @@ func init() {
 	Env = make(map[string]interface{})
 }
 
+func Execute(line string) (string, error) {
+	tokenized := Tokenize(line)
+	parsed, err := Parse(tokenized)
+	if err != nil {
+		return "", err
+	}
+	evaled, err := Eval(parsed)
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%v", evaled), nil
+}
+
 func Eval(expr interface{}) (interface{}, error) {
 	switch expr.(type) {
 	case int: // Int
