@@ -18,6 +18,7 @@ func TestTokenize(t *testing.T) {
 	var tests = map[string][]string{
 		"(define a 42)":            []string{"(", "define", "a", "42", ")"},
 		"\t(quote\n\t\t(a b c))  ": []string{"(", "quote", "(", "a", "b", "c", ")", ")"},
+		"hello ; dude\n\tworld":    []string{"hello", "world"},
 	}
 
 	for in, out := range tests {
