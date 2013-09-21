@@ -26,8 +26,11 @@ func Eval(expr interface{}) (interface{}, error) {
 	case int: // Int
 		return expr, nil
 	case string: // Symbol
-		if val, ok := Env[expr.(string)]; ok {
+		sym := expr.(string)
+		if val, ok := Env[sym]; ok {
 			return val, nil
+		} else if sym == "true" || sym == "false" {
+			return sym, nil
 		} else {
 			return nil, fmt.Errorf("Unknown symbol: %v", expr)
 		}
@@ -48,13 +51,21 @@ func Eval(expr interface{}) (interface{}, error) {
 		} else if t == "set!" { // Set!
 			key := tokens[1].(string)
 			if _, ok := Env[key]; ok {
-				Env[key] = tokens[2]
-				return tokens[2], nil
+				r, err := Eval(tokens[2])
+				if err != nil {
+					return nil, err
+				}
+				Env[key] = r
+				return r, nil
 			} else {
 				return nil, fmt.Errorf("Can only set! variable that is previously defined")
 			}
 		} else if t == "if" { // If
-			if tokens[1] == "true" && len(tokens) > 2 {
+			r, err := Eval(tokens[1])
+			if err != nil {
+				return nil, err
+			}
+			if r != "false" && len(tokens) > 2 {
 				return Eval(tokens[2])
 			} else if len(tokens) > 3 {
 				return Eval(tokens[3])
