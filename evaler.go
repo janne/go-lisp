@@ -42,9 +42,13 @@ func Eval(expr interface{}) (interface{}, error) {
 		} else if t == "quote" { // Quote
 			return tokens[1:], nil
 		} else if t == "define" { // Define
-			r, err := Eval(tokens[2])
-			if err != nil {
-				return nil, err
+			var r interface{}
+			var err error
+			if len(tokens) > 2 {
+				r, err = Eval(tokens[2])
+				if err != nil {
+					return nil, err
+				}
 			}
 			Env[tokens[1].(string)] = r
 			return r, nil
