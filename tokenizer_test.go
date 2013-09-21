@@ -23,7 +23,7 @@ func TestTokenize(t *testing.T) {
 	for in, out := range tests {
 		x := Tokenize(in)
 		if !equalSlices(x, out) {
-			t.Errorf("Tokenize('%v') = '%v', want '%v'", in, x, out)
+			t.Errorf("Tokenize \"%v\" gives \"%v\", expected \"%v\"", in, x, out)
 		}
 	}
 }
