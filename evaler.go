@@ -17,7 +17,7 @@ func Eval(expr interface{}) (interface{}, error) {
 		if val, ok := Env[expr.(string)]; ok {
 			return val, nil
 		} else {
-			return "", fmt.Errorf("Unknown symbol: %v", expr)
+			return nil, fmt.Errorf("Unknown symbol: %v", expr)
 		}
 	case []interface{}:
 		tokens := expr.([]interface{})
@@ -71,5 +71,5 @@ func Eval(expr interface{}) (interface{}, error) {
 			return sum, nil
 		}
 	}
-	return "", fmt.Errorf("Unknown data type: %v", expr)
+	return nil, fmt.Errorf("Unknown data type: %v", expr)
 }
