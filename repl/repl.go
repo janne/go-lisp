@@ -13,7 +13,7 @@ func main() {
 	for {
 		fmt.Printf("> ")
 		line, _ := reader.ReadString('\n')
-		if response, err := lisp.Execute(line); err != nil {
+		if response, err := lisp.EvalString(line); err != nil {
 			fmt.Printf("ERROR: %v\n", err)
 		} else {
 			fmt.Printf("%v\n", response)

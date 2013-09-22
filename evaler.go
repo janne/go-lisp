@@ -2,30 +2,7 @@ package lisp
 
 import "fmt"
 
-var Env map[string]interface{}
-
-type Proc struct {
-	Params Sexp
-	Body   interface{}
-}
-
-func (p Proc) Call(params Sexp) (val interface{}, err error) {
-	if len(p.Params) == len(params) {
-		for i, name := range p.Params {
-			Env[name.(string)] = params[i]
-		}
-		val, err = Eval(p.Body)
-	} else {
-		err = fmt.Errorf("Number of parameters mismatch, %v for %v", len(params), len(p.Params))
-	}
-	return
-}
-
-func init() {
-	Env = make(map[string]interface{})
-}
-
-func Execute(line string) (string, error) {
+func EvalString(line string) (string, error) {
 	tokenized := Tokenize(line)
 	parsed, err := Parse(tokenized)
 	if err != nil {

@@ -29,12 +29,7 @@ func TestEval(t *testing.T) {
 	}
 
 	for in, out := range tests {
-		tokens := Tokenize(in)
-		parsed, err := Parse(tokens)
-		if err != nil {
-			t.Error(err)
-		}
-		x, err := Eval(parsed)
+		x, err := EvalString(in)
 		if err != nil {
 			t.Error(err)
 		} else if fmt.Sprintf("%v", x) != out {
