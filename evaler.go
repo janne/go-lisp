@@ -26,7 +26,7 @@ func Eval(expr interface{}) (val interface{}, err error) {
 		} else if sym == "true" || sym == "false" {
 			val = sym
 		} else {
-			err = fmt.Errorf("Unknown symbol: %v", expr)
+			err = fmt.Errorf("Unbound variable: %v", sym)
 		}
 	case Sexp:
 		tokens := expr.(Sexp)
@@ -38,31 +38,45 @@ func Eval(expr interface{}) (val interface{}, err error) {
 					val, err = p.Call(tokens[1:])
 				}
 			} else if t == "quote" { // Quote
-				val = tokens[1:]
+				if len(tokens) == 2 {
+					val = tokens[1]
+				} else {
+					err = fmt.Errorf("Ill-formed special form: %v", tokens)
+				}
 			} else if t == "define" { // Define
-				if len(tokens) > 2 {
+				if len(tokens) < 2 || len(tokens) > 3 {
+					err = fmt.Errorf("Ill-formed special form: %v", tokens)
+				} else if len(tokens) == 3 {
 					val, err = Eval(tokens[2])
 				}
-				if err == nil && len(tokens) > 1 {
+				if err == nil {
 					Env[tokens[1].(string)] = val
 				}
 			} else if t == "set!" { // Set!
-				key := tokens[1].(string)
-				if _, ok := Env[key]; ok {
-					val, err = Eval(tokens[2])
-					if err == nil {
-						Env[key] = val
+				if len(tokens) == 3 {
+					key := tokens[1].(string)
+					if _, ok := Env[key]; ok {
+						val, err = Eval(tokens[2])
+						if err == nil {
+							Env[key] = val
+						}
+					} else {
+						err = fmt.Errorf("Unbound variable: %v", key)
 					}
 				} else {
-					err = fmt.Errorf("Can only set! variable that is previously defined")
+					err = fmt.Errorf("Ill-formed special form: %v", tokens)
 				}
 			} else if t == "if" { // If
-				r, err := Eval(tokens[1])
-				if err == nil {
-					if r != "false" && r != nil && len(tokens) > 2 {
-						val, err = Eval(tokens[2])
-					} else if len(tokens) > 3 {
-						val, err = Eval(tokens[3])
+				if len(tokens) < 3 || len(tokens) > 4 {
+					err = fmt.Errorf("Ill-formed special form: %v", tokens)
+				} else {
+					r, err := Eval(tokens[1])
+					if err == nil {
+						if r != "false" && r != nil && len(tokens) > 2 {
+							val, err = Eval(tokens[2])
+						} else if len(tokens) == 4 {
+							val, err = Eval(tokens[3])
+						}
 					}
 				}
 			} else if t == "begin" { // Begin
@@ -77,7 +91,7 @@ func Eval(expr interface{}) (val interface{}, err error) {
 					params := tokens[1].(Sexp)
 					val = Proc{params, tokens[2:]}
 				} else {
-					err = fmt.Errorf("Missing parameters to lambda")
+					err = fmt.Errorf("Ill-formed special form: %v", tokens)
 				}
 			} else if t == "+" { // Addition
 				var sum int
