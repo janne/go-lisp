@@ -4,7 +4,7 @@ import "fmt"
 
 type Proc struct {
 	Params Sexp
-	Body   interface{}
+	Body   Sexp
 }
 
 func (p Proc) Call(params Sexp) (val interface{}, err error) {

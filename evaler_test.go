@@ -7,8 +7,7 @@ func TestEval(t *testing.T) {
 	var tests = map[string]interface{}{
 		"()":                                                 "<nil>",
 		"42":                                                 "42",
-		"(42)":                                               "42",
-		"((42))":                                             "42",
+		"1 2 3":                                              "3",
 		"(+ 42 13)":                                          "55",
 		"(+ (+ 1 2 3) 4)":                                    "10",
 		"(quote (1 2 3))":                                    "[1 2 3]",
@@ -25,7 +24,7 @@ func TestEval(t *testing.T) {
 		"(begin (define p 3) (set! p (+ 1 1)) p)":            "2",
 		"(begin (define pi (+ 3 14)) pi)":                    "17",
 		"((lambda (a) (+ a 1)) 42)":                          "43",
-		"(begin (define p 10) (p))":                          "10",
+		"(begin (define p 10) p)":                            "10",
 		"(begin (define inc (lambda (a) (+ a 1))) (inc 42))": "43",
 	}
 
@@ -44,6 +43,7 @@ func TestEvalFailures(t *testing.T) {
 		"hello",
 		"(set! undefined 42)",
 		"(lambda (a))",
+		"(1 2 3)",
 	}
 
 	for _, in := range tests {

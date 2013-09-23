@@ -15,12 +15,22 @@ func EvalString(line string) (string, error) {
 	return fmt.Sprintf("%v", evaled), nil
 }
 
-func Eval(expr interface{}) (val interface{}, err error) {
-	switch expr.(type) {
+func Eval(expr Sexp) (val interface{}, err error) {
+	for _, t := range expr {
+		val, err = evalValue(t)
+		if err != nil {
+			break
+		}
+	}
+	return
+}
+
+func evalValue(input interface{}) (val interface{}, err error) {
+	switch input.(type) {
 	case int: // Int
-		val = expr
+		val = input
 	case string: // Symbol
-		sym := expr.(string)
+		sym := input.(string)
 		if v, ok := Env[sym]; ok {
 			val = v
 		} else if sym == "true" || sym == "false" {
@@ -29,34 +39,36 @@ func Eval(expr interface{}) (val interface{}, err error) {
 			err = fmt.Errorf("Unbound variable: %v", sym)
 		}
 	case Sexp:
-		tokens := expr.(Sexp)
-		if len(tokens) > 0 {
-			t := tokens[0]
+		expr := input.(Sexp)
+		if len(expr) > 0 {
+			t := expr[0]
 			if _, ok := t.(Sexp); ok {
-				val, err = Eval(t)
-				if p, ok := val.(Proc); ok && len(tokens) > 1 {
-					val, err = p.Call(tokens[1:])
+				val, err = evalValue(t)
+				if p, ok := val.(Proc); ok {
+					val, err = p.Call(expr[1:])
+				} else {
+					err = fmt.Errorf("The object %v is not applicable", val)
 				}
 			} else if t == "quote" { // Quote
-				if len(tokens) == 2 {
-					val = tokens[1]
+				if len(expr) == 2 {
+					val = expr[1]
 				} else {
-					err = fmt.Errorf("Ill-formed special form: %v", tokens)
+					err = fmt.Errorf("Ill-formed special form: %v", expr)
 				}
 			} else if t == "define" { // Define
-				if len(tokens) < 2 || len(tokens) > 3 {
-					err = fmt.Errorf("Ill-formed special form: %v", tokens)
-				} else if len(tokens) == 3 {
-					val, err = Eval(tokens[2])
+				if len(expr) < 2 || len(expr) > 3 {
+					err = fmt.Errorf("Ill-formed special form: %v", expr)
+				} else if len(expr) == 3 {
+					val, err = evalValue(expr[2])
 				}
 				if err == nil {
-					Env[tokens[1].(string)] = val
+					Env[expr[1].(string)] = val
 				}
 			} else if t == "set!" { // Set!
-				if len(tokens) == 3 {
-					key := tokens[1].(string)
+				if len(expr) == 3 {
+					key := expr[1].(string)
 					if _, ok := Env[key]; ok {
-						val, err = Eval(tokens[2])
+						val, err = evalValue(expr[2])
 						if err == nil {
 							Env[key] = val
 						}
@@ -64,39 +76,34 @@ func Eval(expr interface{}) (val interface{}, err error) {
 						err = fmt.Errorf("Unbound variable: %v", key)
 					}
 				} else {
-					err = fmt.Errorf("Ill-formed special form: %v", tokens)
+					err = fmt.Errorf("Ill-formed special form: %v", expr)
 				}
 			} else if t == "if" { // If
-				if len(tokens) < 3 || len(tokens) > 4 {
-					err = fmt.Errorf("Ill-formed special form: %v", tokens)
+				if len(expr) < 3 || len(expr) > 4 {
+					err = fmt.Errorf("Ill-formed special form: %v", expr)
 				} else {
-					r, err := Eval(tokens[1])
+					r, err := evalValue(expr[1])
 					if err == nil {
-						if r != "false" && r != nil && len(tokens) > 2 {
-							val, err = Eval(tokens[2])
-						} else if len(tokens) == 4 {
-							val, err = Eval(tokens[3])
+						if r != "false" && r != nil && len(expr) > 2 {
+							val, err = evalValue(expr[2])
+						} else if len(expr) == 4 {
+							val, err = evalValue(expr[3])
 						}
 					}
 				}
 			} else if t == "begin" { // Begin
-				for _, val = range tokens[1:] {
-					val, err = Eval(val)
-					if err != nil {
-						break
-					}
-				}
+				val, err = Eval(expr[1:])
 			} else if t == "lambda" {
-				if len(tokens) > 2 {
-					params := tokens[1].(Sexp)
-					val = Proc{params, tokens[2:]}
+				if len(expr) > 2 {
+					params := expr[1].(Sexp)
+					val = Proc{params, expr[2:]}
 				} else {
-					err = fmt.Errorf("Ill-formed special form: %v", tokens)
+					err = fmt.Errorf("Ill-formed special form: %v", expr)
 				}
 			} else if t == "+" { // Addition
 				var sum int
-				for _, i := range tokens[1:] {
-					j, err := Eval(i)
+				for _, i := range expr[1:] {
+					j, err := evalValue(i)
 					if err == nil {
 						v, ok := j.(int)
 						if ok {
@@ -109,14 +116,16 @@ func Eval(expr interface{}) (val interface{}, err error) {
 				}
 				val = sum
 			} else {
-				val, err = Eval(t)
-				if p, ok := val.(Proc); ok && len(tokens) > 1 {
-					val, err = p.Call(tokens[1:])
+				val, err = evalValue(t)
+				if p, ok := val.(Proc); ok {
+					val, err = p.Call(expr[1:])
+				} else {
+					err = fmt.Errorf("The object %v is not applicable", val)
 				}
 			}
 		}
 	default:
-		err = fmt.Errorf("Unknown data type: %v", expr)
+		err = fmt.Errorf("Unknown data type: %v", input)
 	}
 	return
 }
