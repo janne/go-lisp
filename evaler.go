@@ -43,11 +43,8 @@ func evalValue(input interface{}) (val interface{}, err error) {
 		if len(expr) > 0 {
 			t := expr[0]
 			if _, ok := t.(Sexp); ok {
-				val, err = evalValue(t)
-				if p, ok := val.(Proc); ok {
-					val, err = p.Call(expr[1:])
-				} else {
-					err = fmt.Errorf("The object %v is not applicable", val)
+				if val, err = evalValue(t); err == nil {
+					val, err = runProc(val, expr[1:])
 				}
 			} else if t == "quote" { // Quote
 				if len(expr) == 2 {
@@ -116,16 +113,22 @@ func evalValue(input interface{}) (val interface{}, err error) {
 				}
 				val = sum
 			} else {
-				val, err = evalValue(t)
-				if p, ok := val.(Proc); ok {
-					val, err = p.Call(expr[1:])
-				} else {
-					err = fmt.Errorf("The object %v is not applicable", val)
+				if val, err = evalValue(t); err == nil {
+					val, err = runProc(val, expr[1:])
 				}
 			}
 		}
 	default:
 		err = fmt.Errorf("Unknown data type: %v", input)
+	}
+	return
+}
+
+func runProc(proc interface{}, vars []interface{}) (val interface{}, err error) {
+	if p, ok := proc.(Proc); ok {
+		val, err = p.Call(vars)
+	} else {
+		err = fmt.Errorf("The object %v is not applicable", proc)
 	}
 	return
 }
