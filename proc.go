@@ -3,8 +3,8 @@ package lisp
 import "fmt"
 
 type Proc struct {
-	Params Sexp
-	Body   Sexp
+	params Sexp
+	body   Sexp
 }
 
 func (p Proc) String() string {
@@ -12,13 +12,13 @@ func (p Proc) String() string {
 }
 
 func (p Proc) Call(params Sexp) (val interface{}, err error) {
-	if len(p.Params) == len(params) {
-		for i, name := range p.Params {
+	if len(p.params) == len(params) {
+		for i, name := range p.params {
 			Env[name.(string)] = params[i]
 		}
-		val, err = Eval(p.Body)
+		val, err = Eval(p.body)
 	} else {
-		err = fmt.Errorf("%v has been called with %v arguments; it requires exactly %v arguments", p, len(params), len(p.Params))
+		err = fmt.Errorf("%v has been called with %v arguments; it requires exactly %v arguments", p, len(params), len(p.params))
 	}
 	return
 }
