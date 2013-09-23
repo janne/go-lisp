@@ -7,6 +7,10 @@ type Proc struct {
 	Body   Sexp
 }
 
+func (p Proc) String() string {
+	return "<Procedure>"
+}
+
 func (p Proc) Call(params Sexp) (val interface{}, err error) {
 	if len(p.Params) == len(params) {
 		for i, name := range p.Params {
@@ -14,7 +18,7 @@ func (p Proc) Call(params Sexp) (val interface{}, err error) {
 		}
 		val, err = Eval(p.Body)
 	} else {
-		err = fmt.Errorf("Number of parameters mismatch, %v for %v", len(params), len(p.Params))
+		err = fmt.Errorf("%v has been called with %v arguments; it requires exactly %v arguments", p, len(params), len(p.Params))
 	}
 	return
 }
