@@ -1,14 +1,25 @@
 package lisp
 
 import "fmt"
+import "reflect"
 
-var builtins = map[string]string{
-	"+": "add",
+type Builtin struct{}
+
+var builtin = Builtin{}
+
+var builtin_commands = map[string]string{
+	"+":  "Add",
+	"-":  "Sub",
+	"*":  "Mul",
+	">":  "Gt",
+	"<":  "Lt",
+	">=": "Gte",
+	"<=": "Lte",
 }
 
 func isBuiltin(c interface{}) bool {
 	if s, ok := c.(string); ok {
-		if _, ok := builtins[s]; ok {
+		if _, ok := builtin_commands[s]; ok {
 			return true
 		}
 	}
@@ -16,21 +27,107 @@ func isBuiltin(c interface{}) bool {
 }
 
 func runBuiltin(c string, args []interface{}) (val interface{}, err error) {
-	cmd := builtins[c]
-	if cmd == "add" {
-		val, err = add(args...)
+	cmd := builtin_commands[c]
+	values := []reflect.Value{}
+	for _, arg := range args {
+		values = append(values, reflect.ValueOf(arg))
 	}
+	result := reflect.ValueOf(&builtin).MethodByName(cmd).Call(values)
+	val = result[0].Interface()
+	err, _ = result[1].Interface().(error)
 	return
 }
 
-func add(vars ...interface{}) (interface{}, error) {
+func (Builtin) Add(vars ...interface{}) (interface{}, error) {
 	var sum int
 	for _, v := range vars {
 		if i, ok := v.(int); ok {
 			sum += i
 		} else {
-			return nil, fmt.Errorf("Can only add numbers: %v", i)
+			return nil, fmt.Errorf("Badly formatted arguments: %v", vars)
 		}
 	}
 	return sum, nil
+}
+
+func (Builtin) Sub(vars ...interface{}) (interface{}, error) {
+	sum, ok := vars[0].(int)
+	if !ok {
+		return nil, fmt.Errorf("Badly formatted arguments: %v", vars)
+	}
+	for _, v := range vars[1:] {
+		if i, ok := v.(int); ok {
+			sum -= i
+		} else {
+			return nil, fmt.Errorf("Badly formatted arguments: %v", vars)
+		}
+	}
+	return sum, nil
+}
+
+func (Builtin) Mul(vars ...interface{}) (interface{}, error) {
+	sum, ok := vars[0].(int)
+	if !ok {
+		return nil, fmt.Errorf("Badly formatted arguments: %v", vars)
+	}
+	for _, v := range vars[1:] {
+		if i, ok := v.(int); ok {
+			sum *= i
+		} else {
+			return nil, fmt.Errorf("Badly formatted arguments: %v", vars)
+		}
+	}
+	return sum, nil
+}
+
+func (Builtin) Gt(vars ...interface{}) (interface{}, error) {
+	for i := 1; i < len(vars); i++ {
+		v1, ok1 := vars[i-1].(int)
+		v2, ok2 := vars[i].(int)
+		if !ok1 && !ok2 {
+			return nil, fmt.Errorf("Badly formatted arguments: %v", vars)
+		} else if !(v1 > v2) {
+			return "false", nil
+		}
+	}
+	return "true", nil
+}
+
+func (Builtin) Lt(vars ...interface{}) (interface{}, error) {
+	for i := 1; i < len(vars); i++ {
+		v1, ok1 := vars[i-1].(int)
+		v2, ok2 := vars[i].(int)
+		if !ok1 && !ok2 {
+			return nil, fmt.Errorf("Badly formatted arguments: %v", vars)
+		} else if !(v1 < v2) {
+			return "false", nil
+		}
+	}
+	return "true", nil
+}
+
+func (Builtin) Gte(vars ...interface{}) (interface{}, error) {
+	for i := 1; i < len(vars); i++ {
+		v1, ok1 := vars[i-1].(int)
+		v2, ok2 := vars[i].(int)
+		if !ok1 && !ok2 {
+			return nil, fmt.Errorf("Badly formatted arguments: %v", vars)
+		} else if !(v1 >= v2) {
+			return "false", nil
+		}
+	}
+	return "true", nil
+}
+
+func (Builtin) Lte(vars ...interface{}) (interface{}, error) {
+	for i := 1; i < len(vars); i++ {
+		v1, ok1 := vars[i-1].(int)
+		v2, ok2 := vars[i].(int)
+		if !ok1 && !ok2 {
+			return nil, fmt.Errorf("Badly formatted arguments: %v", vars)
+		} else if !(v1 <= v2) {
+			return "false", nil
+		}
+	}
+	return "true", nil
 }
