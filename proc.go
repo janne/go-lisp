@@ -15,7 +15,7 @@ func (p Proc) Call(params Sexp) (val interface{}, err error) {
 	if len(p.params) == len(params) {
 		scope.AddEnv()
 		for i, name := range p.params {
-			scope.Set(name.(string), params[i])
+			scope.Create(name.(string), params[i])
 		}
 		val, err = Eval(p.body)
 		scope.DropEnv()

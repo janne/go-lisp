@@ -65,10 +65,10 @@ func evalValue(input interface{}) (val interface{}, err error) {
 						if len(expr) == 3 {
 							var i interface{}
 							if i, err = evalValue(expr[2]); err == nil {
-								scope.Set(key, i)
+								scope.Create(key, i)
 							}
 						} else {
-							scope.Set(key, nil)
+							scope.Create(key, nil)
 						}
 						return key, err
 					}

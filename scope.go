@@ -30,14 +30,29 @@ func (s *Scope) DropEnv() *Env {
 	return s.Env()
 }
 
-func (s *Scope) Set(key string, value interface{}) interface{} {
+func (s *Scope) Create(key string, value interface{}) interface{} {
 	env := *s.Env()
 	env[key] = value
 	return value
 }
 
+func (s *Scope) Set(key string, value interface{}) interface{} {
+	for i := len(s.envs) - 1; i >= 0; i-- {
+		env := *s.envs[i]
+		if _, ok := env[key]; ok {
+			env[key] = value
+			return value
+		}
+	}
+	return s.Create(key, value)
+}
+
 func (s *Scope) Get(key string) (val interface{}, ok bool) {
-	env := *s.Env()
-	val, ok = env[key]
+	for i := len(s.envs) - 1; i >= 0; i-- {
+		env := *s.envs[i]
+		if val, ok = env[key]; ok {
+			break
+		}
+	}
 	return
 }

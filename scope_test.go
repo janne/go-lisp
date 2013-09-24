@@ -36,15 +36,28 @@ func TestScope(t *testing.T) {
 func TestEnv(t *testing.T) {
 	scope := NewScope()
 	scope.AddEnv()
-	if v1 := scope.Set("foo", "bar"); v1 != "bar" {
-		t.Errorf("Env.Set should return bar but returned %v", v1)
+	if v1 := scope.Create("foo", "bar"); v1 != "bar" {
+		t.Errorf("Env.Create should return bar but returned %v", v1)
 	}
 
 	if v2, ok := scope.Get("foo"); v2 != "bar" && ok {
-		t.Errorf("Failed to Set and Get foo, got %v, %v", v2, ok)
+		t.Errorf("Failed to Create and Get foo, got %v, %v", v2, ok)
 	}
 
 	if _, ok := scope.Get("undefined"); ok {
 		t.Errorf("Get of undefined should give false but is %v", ok)
+	}
+
+	scope.AddEnv()
+
+	if v3, ok := scope.Get("foo"); v3 != "bar" {
+		t.Errorf("Failed to Get foo in sub env, got %v, %v", v3, ok)
+	}
+
+	scope.Create("bar", "baz")
+
+	scope.DropEnv()
+	if _, ok := scope.Get("bar"); ok {
+		t.Errorf("We should not be able to get local var bar")
 	}
 }
