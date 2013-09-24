@@ -26,6 +26,7 @@ func TestEval(t *testing.T) {
 		"((lambda (a) (+ a 1)) 42)":                          "43",
 		"(begin (define p 10) p)":                            "10",
 		"(begin (define inc (lambda (a) (+ a 1))) (inc 42))": "43",
+		"(define a 10) ((lambda () (define a 20))) a":        "10",
 	}
 
 	for in, out := range tests {
