@@ -53,14 +53,20 @@ func evalValue(input interface{}) (val interface{}, err error) {
 					err = fmt.Errorf("Ill-formed special form: %v", expr)
 				}
 			} else if t == "define" { // Define
-				if len(expr) < 2 || len(expr) > 3 {
-					err = fmt.Errorf("Ill-formed special form: %v", expr)
-				} else if len(expr) == 3 {
-					val, err = evalValue(expr[2])
+				if len(expr) >= 2 && len(expr) <= 3 {
+					if key, ok := expr[1].(string); ok {
+						if len(expr) == 3 {
+							var i interface{}
+							if i, err = evalValue(expr[2]); err == nil {
+								Env[key] = i
+							}
+						} else {
+							Env[key] = nil
+						}
+						return key, err
+					}
 				}
-				if err == nil {
-					Env[expr[1].(string)] = val
-				}
+				err = fmt.Errorf("Ill-formed special form: %v", expr)
 			} else if t == "set!" { // Set!
 				if len(expr) == 3 {
 					key := expr[1].(string)

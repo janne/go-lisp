@@ -17,7 +17,7 @@ func TestEval(t *testing.T) {
 		"(if false 42 1)":                                    "1",
 		"(if false 42)":                                      "<nil>",
 		"(begin (define x) (if x 1 2))":                      "2",
-		"(define r 3)":                                       "3",
+		"(define r 3)":                                       "r",
 		"(begin 5 (+ 3 4))":                                  "7",
 		"(begin (define p 3) (+ 39 p))":                      "42",
 		"(begin (define p 3) (set! p 4) (+ 1 p))":            "5",
