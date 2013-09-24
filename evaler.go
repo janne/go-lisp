@@ -106,7 +106,7 @@ func evalValue(input interface{}) (val interface{}, err error) {
 			} else if t == "lambda" {
 				if len(expr) > 2 {
 					params := expr[1].(Sexp)
-					val = Proc{params, expr[2:]}
+					val = Proc{params, expr[2:], scope.Dup()}
 				} else {
 					err = fmt.Errorf("Ill-formed special form: %v", expr)
 				}

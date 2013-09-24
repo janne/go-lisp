@@ -8,7 +8,14 @@ type Scope struct {
 
 func NewScope() *Scope {
 	scope := &Scope{}
-	scope.envs = make([]*Env, 0, 10)
+	scope.envs = make([]*Env, 0)
+	return scope
+}
+
+func (s *Scope) Dup() *Scope {
+	scope := &Scope{}
+	scope.envs = make([]*Env, len(s.envs))
+	copy(scope.envs, s.envs)
 	return scope
 }
 
@@ -26,6 +33,7 @@ func (s *Scope) AddEnv() *Env {
 }
 
 func (s *Scope) DropEnv() *Env {
+	s.envs[len(s.envs)-1] = nil
 	s.envs = s.envs[:len(s.envs)-1]
 	return s.Env()
 }
