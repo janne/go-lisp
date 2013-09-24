@@ -110,21 +110,16 @@ func evalValue(input interface{}) (val interface{}, err error) {
 				} else {
 					err = fmt.Errorf("Ill-formed special form: %v", expr)
 				}
-			} else if t == "+" { // Addition
-				var sum int
+			} else if isBuiltin(t) { // Addition
+				args := make([]interface{}, 0)
 				for _, i := range expr[1:] {
-					j, err := evalValue(i)
-					if err == nil {
-						v, ok := j.(int)
-						if ok {
-							sum += int(v)
-						} else {
-							err = fmt.Errorf("Cannot only add numbers: %v", i)
-							break
-						}
+					if value, err := evalValue(i); err != nil {
+						return nil, err
+					} else {
+						args = append(args, value)
 					}
 				}
-				val = sum
+				val, err = runBuiltin(t.(string), args)
 			} else {
 				if val, err = evalValue(t); err == nil {
 					val, err = runProc(val, expr[1:])
