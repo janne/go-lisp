@@ -14,7 +14,7 @@ func (p Proc) String() string {
 func (p Proc) Call(params Sexp) (val interface{}, err error) {
 	if len(p.params) == len(params) {
 		for i, name := range p.params {
-			Env[name.(string)] = params[i]
+			scope.Set(name.(string), params[i])
 		}
 		val, err = Eval(p.body)
 	} else {

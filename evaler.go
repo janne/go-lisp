@@ -2,6 +2,13 @@ package lisp
 
 import "fmt"
 
+var scope *Scope
+
+func init() {
+	scope = NewScope()
+	scope.AddEnv()
+}
+
 func EvalString(line string) (string, error) {
 	tokenized := Tokenize(line)
 	parsed, err := Parse(tokenized)
@@ -31,7 +38,7 @@ func evalValue(input interface{}) (val interface{}, err error) {
 		val = input
 	case string: // Symbol
 		sym := input.(string)
-		if v, ok := Env[sym]; ok {
+		if v, ok := scope.Get(sym); ok {
 			val = v
 		} else if sym == "true" || sym == "false" {
 			val = sym
@@ -58,10 +65,10 @@ func evalValue(input interface{}) (val interface{}, err error) {
 						if len(expr) == 3 {
 							var i interface{}
 							if i, err = evalValue(expr[2]); err == nil {
-								Env[key] = i
+								scope.Set(key, i)
 							}
 						} else {
-							Env[key] = nil
+							scope.Set(key, nil)
 						}
 						return key, err
 					}
@@ -70,10 +77,10 @@ func evalValue(input interface{}) (val interface{}, err error) {
 			} else if t == "set!" { // Set!
 				if len(expr) == 3 {
 					key := expr[1].(string)
-					if _, ok := Env[key]; ok {
+					if _, ok := scope.Get(key); ok {
 						val, err = evalValue(expr[2])
 						if err == nil {
-							Env[key] = val
+							scope.Set(key, val)
 						}
 					} else {
 						err = fmt.Errorf("Unbound variable: %v", key)
