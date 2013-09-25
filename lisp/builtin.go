@@ -27,11 +27,15 @@ func isBuiltin(c Value) bool {
 	return false
 }
 
-func runBuiltin(c string, args []Value) (val Value, err error) {
-	cmd := builtin_commands[c]
+func runBuiltin(expr []Value) (val Value, err error) {
+	cmd := builtin_commands[expr[0].(string)]
 	values := []reflect.Value{}
-	for _, arg := range args {
-		values = append(values, reflect.ValueOf(arg))
+	for _, i := range expr[1:] {
+		if value, err := evalValue(i); err != nil {
+			return nil, err
+		} else {
+			values = append(values, reflect.ValueOf(value))
+		}
 	}
 	result := reflect.ValueOf(&builtin).MethodByName(cmd).Call(values)
 	val = result[0].Interface()
@@ -41,7 +45,7 @@ func runBuiltin(c string, args []Value) (val Value, err error) {
 
 func (Builtin) Display(vars ...Value) (Value, error) {
 	var interfaces []interface{}
-	for _, v := range(vars) {
+	for _, v := range vars {
 		interfaces = append(interfaces, v)
 	}
 	fmt.Println(interfaces...)

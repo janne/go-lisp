@@ -33,19 +33,32 @@ func Eval(expr Sexp) (val Value, err error) {
 	return
 }
 
-func evalList(expr []Value) (args []Value, err error) {
-	for _, i := range expr {
-		if value, err := evalValue(i); err != nil {
-			return nil, err
-		} else {
-			args = append(args, value)
-		}
-	}
-	return
-}
-
 func evalValue(input Value) (val Value, err error) {
 	switch input.(type) {
+	case Sexp:
+		expr := input.(Sexp)
+		if len(expr) > 0 {
+			switch expr[0] {
+			case "quote":
+				return quoteForm(expr)
+			case "if":
+				return ifForm(expr)
+			case "set!":
+				return setForm(expr)
+			case "define":
+				return defineForm(expr)
+			case "lambda":
+				return lambdaForm(expr)
+			case "begin":
+				return beginForm(expr)
+			default:
+				if isBuiltin(expr[0]) {
+					return runBuiltin(expr)
+				} else {
+					return procForm(expr)
+				}
+			}
+		}
 	case int: // Int
 		val = input
 	case string: // Symbol
@@ -55,38 +68,10 @@ func evalValue(input Value) (val Value, err error) {
 		} else if sym == "true" || sym == "false" {
 			val = sym
 		} else {
-			err = fmt.Errorf("Unbound variable: %v", sym)
-		}
-	case Sexp:
-		expr := input.(Sexp)
-		if len(expr) > 0 {
-			t := expr[0]
-			if _, ok := t.(Sexp); ok {
-				val, err = procForm(expr)
-			} else if t == "quote" {
-				val, err = quoteForm(expr)
-			} else if t == "if" {
-				val, err = ifForm(expr)
-			} else if t == "set!" {
-				val, err = setForm(expr)
-			} else if t == "define" {
-				val, err = defineForm(expr)
-			} else if t == "lambda" {
-				val, err = lambdaForm(expr)
-			} else if t == "begin" {
-				val, err = beginForm(expr)
-			} else if isBuiltin(t) {
-				var args []Value
-				args, err = evalList(expr[1:])
-				if err == nil {
-					val, err = runBuiltin(t.(string), args)
-				}
-			} else {
-				val, err = procForm(expr)
-			}
+			return nil, fmt.Errorf("Unbound variable: %v", sym)
 		}
 	default:
-		err = fmt.Errorf("Unknown data type: %v", input)
+		return nil, fmt.Errorf("Unknown data type: %v", input)
 	}
 	return
 }
