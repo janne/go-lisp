@@ -8,13 +8,14 @@ type Builtin struct{}
 var builtin = Builtin{}
 
 var builtin_commands = map[string]string{
-	"+":  "Add",
-	"-":  "Sub",
-	"*":  "Mul",
-	">":  "Gt",
-	"<":  "Lt",
-	">=": "Gte",
-	"<=": "Lte",
+	"+":       "Add",
+	"-":       "Sub",
+	"*":       "Mul",
+	">":       "Gt",
+	"<":       "Lt",
+	">=":      "Gte",
+	"<=":      "Lte",
+	"display": "Display",
 }
 
 func isBuiltin(c interface{}) bool {
@@ -36,6 +37,11 @@ func runBuiltin(c string, args []interface{}) (val interface{}, err error) {
 	val = result[0].Interface()
 	err, _ = result[1].Interface().(error)
 	return
+}
+
+func (Builtin) Display(vars ...interface{}) (interface{}, error) {
+	fmt.Println(vars...)
+	return nil, nil
 }
 
 func (Builtin) Add(vars ...interface{}) (interface{}, error) {
