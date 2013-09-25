@@ -30,6 +30,7 @@ func TestEval(t *testing.T) {
 		"(define a 0) ((lambda () (set! a 10))) a":                                                       "10",
 		"((lambda (i) i) (+ 5 5))":                                                                       "10",
 		"(define inc ((lambda () (begin (define a 0) (lambda () (set! a (+ a 1))))))) (inc) (inc) (inc)": "3",
+		"(define fact (lambda (n) (if (<= n 1) 1 (* n (fact (- n 1)))))) (fact 20)":                      "2432902008176640000",
 	}
 
 	for in, out := range tests {
