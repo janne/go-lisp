@@ -135,7 +135,15 @@ func evalValue(input interface{}) (val interface{}, err error) {
 
 func runProc(proc interface{}, vars []interface{}) (val interface{}, err error) {
 	if p, ok := proc.(Proc); ok {
-		val, err = p.Call(vars)
+		var args []interface{}
+		for _, v := range vars {
+			if e, err := evalValue(v); err != nil {
+				return nil, err
+			} else {
+				args = append(args, e)
+			}
+		}
+		val, err = p.Call(args)
 	} else {
 		err = fmt.Errorf("The object %v is not applicable", proc)
 	}

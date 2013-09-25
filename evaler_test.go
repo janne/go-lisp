@@ -28,6 +28,7 @@ func TestEval(t *testing.T) {
 		"(begin (define inc (lambda (a) (+ a 1))) (inc 42))":                                             "43",
 		"(define a 10) ((lambda () (define a 20))) a":                                                    "10",
 		"(define a 0) ((lambda () (set! a 10))) a":                                                       "10",
+		"((lambda (i) i) (+ 5 5))":                                                                       "10",
 		"(define inc ((lambda () (begin (define a 0) (lambda () (set! a (+ a 1))))))) (inc) (inc) (inc)": "3",
 	}
 
