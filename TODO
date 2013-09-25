@@ -1,14 +1,28 @@
-- Allow multiline expressions in interactive mode
 - Refactorings
+- Change []Value to Sexp
+- Add methods to Value and Sexp
   - Break up Eval
-  - Test error message in TestEvalFailures, add more
+- Strings in Tokenize/Parse
+- Implement tapping into packages
+  - Use pkgreflect to create maps
+    - https://github.com/ungerik/pkgreflect
+  - (fmt/Printf "Hello, world!")
+  - (.Body (first (http/Get "http://example.com/")))
+  - (. (. (. http (Get "http://example.com/")) (first)) (Body))
+  - (.. (http (Get "http://example.com/")) (first) (Body))
+  - (-> (http (Get "http://example.com/")) (first) (Body))
+  - (doto (http/Get "http://example.com/") (first) (Body))
+  - Compare http://clojure.org/java_interop
+- Improve testing
+  - Test for error message in TestEvalFailures
+- Allow multiline expressions in interactive mode
 - Add short forms
   - Define abbrev form
     - (define (inc x) (+ x 1))
   - 'smth rather than (quote smth)?
   - Macros
-- More types
-  - Floats
-  - UTF-8 strings
+- Support for modules
+  - http://www.htus.org/Book/Staging/how-to-use-modules/
+- Floats
 - More support for Scheme
   - http://people.csail.mit.edu/jaffer/r5rs_toc.html
