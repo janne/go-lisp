@@ -19,6 +19,7 @@ func EvalString(line string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	scope.Create("_", evaled)
 	return fmt.Sprintf("%v", evaled), nil
 }
 
