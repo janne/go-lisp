@@ -16,7 +16,7 @@ func main() {
 		if response, err := lisp.EvalString(line); err != nil {
 			fmt.Printf("ERROR: %v\n", err)
 		} else {
-			fmt.Printf("%v\n", response)
+			fmt.Printf("=> %v\n", response)
 		}
 	}
 }
