@@ -4,13 +4,15 @@ import "regexp"
 import "fmt"
 import "strconv"
 
-type Sexp []interface{}
+type Value interface{}
+
+type Sexp []Value
 
 func (s Sexp) String() string {
 	if len(s) == 1 {
 		return fmt.Sprintf("%v", s[0])
 	} else {
-		return fmt.Sprintf("%v", []interface{}(s))
+		return fmt.Sprintf("%v", []Value(s))
 	}
 }
 

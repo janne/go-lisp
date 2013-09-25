@@ -23,7 +23,7 @@ func EvalString(line string) (string, error) {
 	return fmt.Sprintf("%v", evaled), nil
 }
 
-func Eval(expr Sexp) (val interface{}, err error) {
+func Eval(expr Sexp) (val Value, err error) {
 	for _, t := range expr {
 		val, err = evalValue(t)
 		if err != nil {
@@ -33,7 +33,7 @@ func Eval(expr Sexp) (val interface{}, err error) {
 	return
 }
 
-func evalList(expr []interface{}) (args []interface{}, err error) {
+func evalList(expr []Value) (args []Value, err error) {
 	for _, i := range expr {
 		if value, err := evalValue(i); err != nil {
 			return nil, err
@@ -44,7 +44,7 @@ func evalList(expr []interface{}) (args []interface{}, err error) {
 	return
 }
 
-func evalValue(input interface{}) (val interface{}, err error) {
+func evalValue(input Value) (val Value, err error) {
 	switch input.(type) {
 	case int: // Int
 		val = input
@@ -76,7 +76,7 @@ func evalValue(input interface{}) (val interface{}, err error) {
 			} else if t == "begin" {
 				val, err = beginForm(expr)
 			} else if isBuiltin(t) {
-				var args []interface{}
+				var args []Value
 				args, err = evalList(expr[1:])
 				if err == nil {
 					val, err = runBuiltin(t.(string), args)
@@ -91,18 +91,18 @@ func evalValue(input interface{}) (val interface{}, err error) {
 	return
 }
 
-func procForm(expr []interface{}) (val interface{}, err error) {
+func procForm(expr []Value) (val Value, err error) {
 	if val, err = evalValue(expr[0]); err == nil {
 		val, err = runProc(val, expr[1:])
 	}
 	return
 }
 
-func beginForm(expr []interface{}) (val interface{}, err error) {
+func beginForm(expr []Value) (val Value, err error) {
 	return Eval(expr[1:])
 }
 
-func setForm(expr []interface{}) (val interface{}, err error) {
+func setForm(expr []Value) (val Value, err error) {
 	if len(expr) == 3 {
 		key := expr[1].(string)
 		if _, ok := scope.Get(key); ok {
@@ -119,7 +119,7 @@ func setForm(expr []interface{}) (val interface{}, err error) {
 	return
 }
 
-func ifForm(expr []interface{}) (val interface{}, err error) {
+func ifForm(expr []Value) (val Value, err error) {
 	if len(expr) < 3 || len(expr) > 4 {
 		err = fmt.Errorf("Ill-formed special form: %v", expr)
 	} else {
@@ -135,7 +135,7 @@ func ifForm(expr []interface{}) (val interface{}, err error) {
 	return
 }
 
-func lambdaForm(expr []interface{}) (val interface{}, err error) {
+func lambdaForm(expr []Value) (val Value, err error) {
 	if len(expr) > 2 {
 		params := expr[1].(Sexp)
 		val = Proc{params, expr[2:], scope.Dup()}
@@ -145,7 +145,7 @@ func lambdaForm(expr []interface{}) (val interface{}, err error) {
 	return
 }
 
-func quoteForm(expr []interface{}) (val interface{}, err error) {
+func quoteForm(expr []Value) (val Value, err error) {
 	if len(expr) == 2 {
 		val = expr[1]
 	} else {
@@ -154,11 +154,11 @@ func quoteForm(expr []interface{}) (val interface{}, err error) {
 	return
 }
 
-func defineForm(expr []interface{}) (val interface{}, err error) {
+func defineForm(expr []Value) (val Value, err error) {
 	if len(expr) >= 2 && len(expr) <= 3 {
 		if key, ok := expr[1].(string); ok {
 			if len(expr) == 3 {
-				var i interface{}
+				var i Value
 				if i, err = evalValue(expr[2]); err == nil {
 					scope.Create(key, i)
 				}
@@ -171,9 +171,9 @@ func defineForm(expr []interface{}) (val interface{}, err error) {
 	return nil, fmt.Errorf("Ill-formed special form: %v", expr)
 }
 
-func runProc(proc interface{}, vars []interface{}) (val interface{}, err error) {
+func runProc(proc Value, vars []Value) (val Value, err error) {
 	if p, ok := proc.(Proc); ok {
-		var args []interface{}
+		var args []Value
 		for _, v := range vars {
 			if e, err := evalValue(v); err != nil {
 				return nil, err

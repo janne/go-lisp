@@ -1,6 +1,6 @@
 package lisp
 
-type Env map[string]interface{}
+type Env map[string]Value
 
 type Scope struct {
 	envs []*Env
@@ -38,13 +38,13 @@ func (s *Scope) DropEnv() *Env {
 	return s.Env()
 }
 
-func (s *Scope) Create(key string, value interface{}) interface{} {
+func (s *Scope) Create(key string, value Value) Value {
 	env := *s.Env()
 	env[key] = value
 	return value
 }
 
-func (s *Scope) Set(key string, value interface{}) interface{} {
+func (s *Scope) Set(key string, value Value) Value {
 	for i := len(s.envs) - 1; i >= 0; i-- {
 		env := *s.envs[i]
 		if _, ok := env[key]; ok {
@@ -55,7 +55,7 @@ func (s *Scope) Set(key string, value interface{}) interface{} {
 	return s.Create(key, value)
 }
 
-func (s *Scope) Get(key string) (val interface{}, ok bool) {
+func (s *Scope) Get(key string) (val Value, ok bool) {
 	for i := len(s.envs) - 1; i >= 0; i-- {
 		env := *s.envs[i]
 		if val, ok = env[key]; ok {

@@ -4,7 +4,7 @@ import "testing"
 import "fmt"
 
 func TestEval(t *testing.T) {
-	var tests = map[string]interface{}{
+	var tests = map[string]Value{
 		"()":                                                                                             "<nil>",
 		"42":                                                                                             "42",
 		"1 2 3":                                                                                          "3",

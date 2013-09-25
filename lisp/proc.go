@@ -12,7 +12,7 @@ func (p Proc) String() string {
 	return "<Procedure>"
 }
 
-func (p Proc) Call(params Sexp) (val interface{}, err error) {
+func (p Proc) Call(params Sexp) (val Value, err error) {
 	if len(p.params) == len(params) {
 		old_scope := scope
 		scope = p.scope

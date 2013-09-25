@@ -18,7 +18,7 @@ var builtin_commands = map[string]string{
 	"display": "Display",
 }
 
-func isBuiltin(c interface{}) bool {
+func isBuiltin(c Value) bool {
 	if s, ok := c.(string); ok {
 		if _, ok := builtin_commands[s]; ok {
 			return true
@@ -27,7 +27,7 @@ func isBuiltin(c interface{}) bool {
 	return false
 }
 
-func runBuiltin(c string, args []interface{}) (val interface{}, err error) {
+func runBuiltin(c string, args []Value) (val Value, err error) {
 	cmd := builtin_commands[c]
 	values := []reflect.Value{}
 	for _, arg := range args {
@@ -39,12 +39,16 @@ func runBuiltin(c string, args []interface{}) (val interface{}, err error) {
 	return
 }
 
-func (Builtin) Display(vars ...interface{}) (interface{}, error) {
-	fmt.Println(vars...)
+func (Builtin) Display(vars ...Value) (Value, error) {
+	var interfaces []interface{}
+	for _, v := range(vars) {
+		interfaces = append(interfaces, v)
+	}
+	fmt.Println(interfaces...)
 	return nil, nil
 }
 
-func (Builtin) Add(vars ...interface{}) (interface{}, error) {
+func (Builtin) Add(vars ...Value) (Value, error) {
 	var sum int
 	for _, v := range vars {
 		if i, ok := v.(int); ok {
@@ -56,7 +60,7 @@ func (Builtin) Add(vars ...interface{}) (interface{}, error) {
 	return sum, nil
 }
 
-func (Builtin) Sub(vars ...interface{}) (interface{}, error) {
+func (Builtin) Sub(vars ...Value) (Value, error) {
 	sum, ok := vars[0].(int)
 	if !ok {
 		return nil, fmt.Errorf("Badly formatted arguments: %v", vars)
@@ -71,7 +75,7 @@ func (Builtin) Sub(vars ...interface{}) (interface{}, error) {
 	return sum, nil
 }
 
-func (Builtin) Mul(vars ...interface{}) (interface{}, error) {
+func (Builtin) Mul(vars ...Value) (Value, error) {
 	sum, ok := vars[0].(int)
 	if !ok {
 		return nil, fmt.Errorf("Badly formatted arguments: %v", vars)
@@ -86,7 +90,7 @@ func (Builtin) Mul(vars ...interface{}) (interface{}, error) {
 	return sum, nil
 }
 
-func (Builtin) Gt(vars ...interface{}) (interface{}, error) {
+func (Builtin) Gt(vars ...Value) (Value, error) {
 	for i := 1; i < len(vars); i++ {
 		v1, ok1 := vars[i-1].(int)
 		v2, ok2 := vars[i].(int)
@@ -99,7 +103,7 @@ func (Builtin) Gt(vars ...interface{}) (interface{}, error) {
 	return "true", nil
 }
 
-func (Builtin) Lt(vars ...interface{}) (interface{}, error) {
+func (Builtin) Lt(vars ...Value) (Value, error) {
 	for i := 1; i < len(vars); i++ {
 		v1, ok1 := vars[i-1].(int)
 		v2, ok2 := vars[i].(int)
@@ -112,7 +116,7 @@ func (Builtin) Lt(vars ...interface{}) (interface{}, error) {
 	return "true", nil
 }
 
-func (Builtin) Gte(vars ...interface{}) (interface{}, error) {
+func (Builtin) Gte(vars ...Value) (Value, error) {
 	for i := 1; i < len(vars); i++ {
 		v1, ok1 := vars[i-1].(int)
 		v2, ok2 := vars[i].(int)
@@ -125,7 +129,7 @@ func (Builtin) Gte(vars ...interface{}) (interface{}, error) {
 	return "true", nil
 }
 
-func (Builtin) Lte(vars ...interface{}) (interface{}, error) {
+func (Builtin) Lte(vars ...Value) (Value, error) {
 	for i := 1; i < len(vars); i++ {
 		v1, ok1 := vars[i-1].(int)
 		v2, ok2 := vars[i].(int)
