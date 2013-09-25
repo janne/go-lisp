@@ -1,5 +1,5 @@
-LISP.go
-=======
+go-lisp.go
+==========
 
 A simple, embeddable LISP interpreter in Go.
 
@@ -53,7 +53,7 @@ body.
 Evaluate each of the expressions in left-to-right order, and return the final
 value.
 
-    (begin (set! x 1) (set! x (+ x 1)) (* x 2))
+    (begin (define x 1) (set! x (+ x 1)) (* x 2))
 
 Returns:
 

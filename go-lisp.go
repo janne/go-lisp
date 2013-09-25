@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"bufio"
 	"os"
-	"lisp"
+	"github.com/janne/go-lisp/lisp"
 )
 
 func main() {
