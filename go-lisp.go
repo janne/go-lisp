@@ -7,6 +7,7 @@ import (
 	"github.com/janne/go-lisp/lisp"
 	"io/ioutil"
 	"os"
+	"strings"
 )
 
 func main() {
@@ -36,13 +37,27 @@ func main() {
 func Repl() {
 	fmt.Printf("Welcome to the Lisp REPL\n")
 	reader := bufio.NewReader(os.Stdin)
+	expr := ""
 	for {
-		fmt.Printf("> ")
+		if expr == "" {
+			fmt.Printf("> ")
+		}
 		line, _ := reader.ReadString('\n')
-		if response, err := lisp.EvalString(line); err != nil {
-			fmt.Printf("ERROR: %v\n", err)
-		} else {
-			fmt.Printf("=> %v\n", response)
+		expr = fmt.Sprintf("%v%v", expr, line)
+		openCount := strings.Count(expr, "(")
+		closeCount := strings.Count(expr, ")")
+		if openCount < closeCount {
+			fmt.Printf("ERROR: Malformed expression: %v", line)
+			expr = ""
+		} else if openCount == closeCount {
+			if strings.TrimSpace(expr) != "" {
+				if response, err := lisp.EvalString(expr); err != nil {
+					fmt.Printf("ERROR: %v\n", err)
+				} else {
+					fmt.Printf("=> %v\n", response)
+				}
+			}
+			expr = ""
 		}
 	}
 }
