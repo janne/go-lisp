@@ -27,7 +27,7 @@ func isBuiltin(c Value) bool {
 	return false
 }
 
-func runBuiltin(expr []Value) (val Value, err error) {
+func runBuiltin(expr Sexp) (val Value, err error) {
 	cmd := builtin_commands[expr[0].(string)]
 	values := []reflect.Value{}
 	for _, i := range expr[1:] {

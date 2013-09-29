@@ -76,18 +76,30 @@ func evalValue(input Value) (val Value, err error) {
 	return
 }
 
-func procForm(expr []Value) (val Value, err error) {
+func procForm(expr Sexp) (val Value, err error) {
 	if val, err = evalValue(expr[0]); err == nil {
-		val, err = runProc(val, expr[1:])
+		if proc, ok := val.(Proc); ok {
+			var args []Value
+			for _, v := range expr[1:] {
+				if e, err := evalValue(v); err != nil {
+					return nil, err
+				} else {
+					args = append(args, e)
+				}
+			}
+			val, err = proc.Call(args)
+		} else {
+			err = fmt.Errorf("The object %v is not applicable", val)
+		}
 	}
 	return
 }
 
-func beginForm(expr []Value) (val Value, err error) {
+func beginForm(expr Sexp) (val Value, err error) {
 	return Eval(expr[1:])
 }
 
-func setForm(expr []Value) (val Value, err error) {
+func setForm(expr Sexp) (val Value, err error) {
 	if len(expr) == 3 {
 		key := expr[1].(string)
 		if _, ok := scope.Get(key); ok {
@@ -104,7 +116,7 @@ func setForm(expr []Value) (val Value, err error) {
 	return
 }
 
-func ifForm(expr []Value) (val Value, err error) {
+func ifForm(expr Sexp) (val Value, err error) {
 	if len(expr) < 3 || len(expr) > 4 {
 		err = fmt.Errorf("Ill-formed special form: %v", expr)
 	} else {
@@ -120,7 +132,7 @@ func ifForm(expr []Value) (val Value, err error) {
 	return
 }
 
-func lambdaForm(expr []Value) (val Value, err error) {
+func lambdaForm(expr Sexp) (val Value, err error) {
 	if len(expr) > 2 {
 		params := expr[1].(Sexp)
 		val = Proc{params, expr[2:], scope.Dup()}
@@ -130,7 +142,7 @@ func lambdaForm(expr []Value) (val Value, err error) {
 	return
 }
 
-func quoteForm(expr []Value) (val Value, err error) {
+func quoteForm(expr Sexp) (val Value, err error) {
 	if len(expr) == 2 {
 		val = expr[1]
 	} else {
@@ -139,7 +151,7 @@ func quoteForm(expr []Value) (val Value, err error) {
 	return
 }
 
-func defineForm(expr []Value) (val Value, err error) {
+func defineForm(expr Sexp) (val Value, err error) {
 	if len(expr) >= 2 && len(expr) <= 3 {
 		if key, ok := expr[1].(string); ok {
 			if len(expr) == 3 {
@@ -154,21 +166,4 @@ func defineForm(expr []Value) (val Value, err error) {
 		}
 	}
 	return nil, fmt.Errorf("Ill-formed special form: %v", expr)
-}
-
-func runProc(proc Value, vars []Value) (val Value, err error) {
-	if p, ok := proc.(Proc); ok {
-		var args []Value
-		for _, v := range vars {
-			if e, err := evalValue(v); err != nil {
-				return nil, err
-			} else {
-				args = append(args, e)
-			}
-		}
-		val, err = p.Call(args)
-	} else {
-		err = fmt.Errorf("The object %v is not applicable", proc)
-	}
-	return
 }
