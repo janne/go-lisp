@@ -1,5 +1,12 @@
 package lisp
 
+var scope *Scope
+
+func init() {
+	scope = NewScope()
+	scope.AddEnv()
+}
+
 type Env map[string]Value
 
 type Scope struct {

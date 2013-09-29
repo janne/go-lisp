@@ -2,13 +2,6 @@ package lisp
 
 import "fmt"
 
-var scope *Scope
-
-func init() {
-	scope = NewScope()
-	scope.AddEnv()
-}
-
 func EvalString(line string) (string, error) {
 	tokenized := Tokenize(line)
 	parsed, err := Parse(tokenized)
