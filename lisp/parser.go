@@ -1,8 +1,11 @@
 package lisp
 
-import "regexp"
-import "fmt"
-import "strconv"
+import (
+	"fmt"
+	"regexp"
+	"strconv"
+	"strings"
+)
 
 type Value interface{}
 
@@ -28,18 +31,27 @@ func Parse(tokens []string) (Sexp, error) {
 			}
 			values = append(values, i)
 			pos++
+		} else if t == "\"" { // Quote
+			start := pos + 1
+			if end, err := findQuote(tokens, start); err != nil {
+				return nil, err
+			} else {
+				s := fmt.Sprintf("\"%v\"", strings.Join(tokens[start:end], " "))
+				values = append(values, s)
+				pos = end + 1
+			}
 		} else if t == "(" { // Open parenthesis
 			start := pos + 1
-			end, err := findEnd(tokens, start)
-			if err != nil {
+			if end, err := findClosing(tokens, start); err != nil {
 				return nil, err
+			} else {
+				if x, err := Parse(tokens[start:end]); err != nil {
+					return nil, err
+				} else {
+					values = append(values, x)
+					pos = end + 1
+				}
 			}
-			x, err := Parse(tokens[start:end])
-			if err != nil {
-				return nil, err
-			}
-			values = append(values, x)
-			pos = end + 1
 		} else if t == ")" { // Close parenthesis
 			return nil, fmt.Errorf("List was closed but not opened")
 		} else { // Symbol
@@ -50,7 +62,16 @@ func Parse(tokens []string) (Sexp, error) {
 	return values, nil
 }
 
-func findEnd(tokens []string, start int) (int, error) {
+func findQuote(tokens []string, start int) (int, error) {
+	for i := start; i < len(tokens); i++ {
+		if tokens[i] == "\"" {
+			return i, nil
+		}
+	}
+	return 0, fmt.Errorf("Matching quote was not found")
+}
+
+func findClosing(tokens []string, start int) (int, error) {
 	depth := 1
 
 	for i := start; i < len(tokens); i++ {

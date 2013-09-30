@@ -10,6 +10,9 @@ func TestParse(t *testing.T) {
 	}{
 		{"42", "42"},
 		{"(+ (+ 1 2) 3)", "[+ [+ 1 2] 3]"},
+		{"(display \"Hello\")", "[display \"Hello\"]"},
+		{"\"Hello\"", "\"Hello\""},
+		{"\"Quote \\\"in\\\" quote\"", "\"Quote \\\"in\\\" quote\""},
 	}
 	for _, test := range tests {
 		tokens := Tokenize(test.in)

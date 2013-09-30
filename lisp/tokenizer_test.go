@@ -20,6 +20,7 @@ func TestTokenize(t *testing.T) {
 		out []string
 	}{
 		{"(define a 42)", []string{"(", "define", "a", "42", ")"}},
+		{"(define \"a string\")", []string{"(", "define", "\"", "a", "string", "\"", ")"}},
 		{"\t(quote\n\t\t(a b c))  ", []string{"(", "quote", "(", "a", "b", "c", ")", ")"}},
 		{"hello ; dude\n\tworld", []string{"hello", "world"}},
 	}
