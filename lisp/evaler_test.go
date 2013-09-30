@@ -6,7 +6,7 @@ import "fmt"
 func TestEval(t *testing.T) {
 	var tests = []struct {
 		in  string
-		out Value
+		out string
 	}{
 		{"()", "<nil>"},
 		{"42", "42"},

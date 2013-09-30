@@ -18,7 +18,7 @@ func (p Proc) Call(params Sexp) (val Value, err error) {
 		scope = p.scope
 		scope.AddEnv()
 		for i, name := range p.params {
-			scope.Create(name.(string), params[i])
+			scope.Create(name.String(), params[i])
 		}
 		val, err = Eval(p.body)
 		scope.DropEnv()

@@ -1,20 +1,10 @@
 package lisp
 
-import "regexp"
-import "fmt"
-import "strconv"
-
-type Value interface{}
-
-type Sexp []Value
-
-func (s Sexp) String() string {
-	if len(s) == 1 {
-		return fmt.Sprintf("%v", s[0])
-	} else {
-		return fmt.Sprintf("%v", []Value(s))
-	}
-}
+import (
+	"fmt"
+	"regexp"
+	"strconv"
+)
 
 func Parse(tokens []string) (Sexp, error) {
 	var pos int
@@ -22,12 +12,12 @@ func Parse(tokens []string) (Sexp, error) {
 	for pos < len(tokens) {
 		t := tokens[pos]
 		if m, _ := regexp.MatchString("^\\d+$", t); m { // Number
-			i, err := strconv.Atoi(t)
-			if err != nil {
-				fmt.Errorf("Failed to convert number: %v", t)
+			if i, err := strconv.Atoi(t); err != nil {
+				return nil, fmt.Errorf("Failed to convert number: %v", t)
+			} else {
+				values = append(values, NewValue(i))
+				pos++
 			}
-			values = append(values, i)
-			pos++
 		} else if t == "(" { // Open parenthesis
 			start := pos + 1
 			end, err := findEnd(tokens, start)
@@ -38,12 +28,12 @@ func Parse(tokens []string) (Sexp, error) {
 			if err != nil {
 				return nil, err
 			}
-			values = append(values, x)
+			values = append(values, NewValue(x))
 			pos = end + 1
 		} else if t == ")" { // Close parenthesis
 			return nil, fmt.Errorf("List was closed but not opened")
 		} else { // Symbol
-			values = append(values, t)
+			values = append(values, NewValue(t))
 			pos++
 		}
 	}

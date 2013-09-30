@@ -27,11 +27,11 @@ func Eval(expr Sexp) (val Value, err error) {
 }
 
 func evalValue(input Value) (val Value, err error) {
-	switch input.(type) {
-	case Sexp:
-		expr := input.(Sexp)
+	switch input.Kind {
+	case SexpKind:
+		expr := input.Sexp()
 		if len(expr) > 0 {
-			switch expr[0] {
+			switch expr[0].String() {
 			case "quote":
 				return quoteForm(expr)
 			case "if":
@@ -52,35 +52,35 @@ func evalValue(input Value) (val Value, err error) {
 				}
 			}
 		}
-	case int: // Int
+	case NumberKind:
 		val = input
-	case string: // Symbol
-		sym := input.(string)
+	case SymbolKind:
+		sym := input.String()
 		if v, ok := scope.Get(sym); ok {
 			val = v
 		} else if sym == "true" || sym == "false" {
-			val = sym
+			val = NewValue(sym)
 		} else {
-			return nil, fmt.Errorf("Unbound variable: %v", sym)
+			return Nil, fmt.Errorf("Unbound variable: %v", sym)
 		}
 	default:
-		return nil, fmt.Errorf("Unknown data type: %v", input)
+		return Nil, fmt.Errorf("Unknown data type: %v", input)
 	}
 	return
 }
 
 func procForm(expr Sexp) (val Value, err error) {
 	if val, err = evalValue(expr[0]); err == nil {
-		if proc, ok := val.(Proc); ok {
+		if val.IsA(ProcKind) {
 			var args []Value
 			for _, v := range expr[1:] {
 				if e, err := evalValue(v); err != nil {
-					return nil, err
+					return Nil, err
 				} else {
 					args = append(args, e)
 				}
 			}
-			val, err = proc.Call(args)
+			val, err = val.Proc().Call(args)
 		} else {
 			err = fmt.Errorf("The object %v is not applicable", val)
 		}
@@ -94,7 +94,7 @@ func beginForm(expr Sexp) (val Value, err error) {
 
 func setForm(expr Sexp) (val Value, err error) {
 	if len(expr) == 3 {
-		key := expr[1].(string)
+		key := expr[1].String()
 		if _, ok := scope.Get(key); ok {
 			val, err = evalValue(expr[2])
 			if err == nil {
@@ -115,7 +115,7 @@ func ifForm(expr Sexp) (val Value, err error) {
 	} else {
 		r, err := evalValue(expr[1])
 		if err == nil {
-			if r != "false" && r != nil && len(expr) > 2 {
+			if !(r.IsA(SymbolKind) && r.String() == "false") && r != Nil && len(expr) > 2 {
 				val, err = evalValue(expr[2])
 			} else if len(expr) == 4 {
 				val, err = evalValue(expr[3])
@@ -127,8 +127,8 @@ func ifForm(expr Sexp) (val Value, err error) {
 
 func lambdaForm(expr Sexp) (val Value, err error) {
 	if len(expr) > 2 {
-		params := expr[1].(Sexp)
-		val = Proc{params, expr[2:], scope.Dup()}
+		params := expr[1].Sexp()
+		val = NewValue(Proc{params, expr[2:], scope.Dup()})
 	} else {
 		err = fmt.Errorf("Ill-formed special form: %v", expr)
 	}
@@ -146,17 +146,18 @@ func quoteForm(expr Sexp) (val Value, err error) {
 
 func defineForm(expr Sexp) (val Value, err error) {
 	if len(expr) >= 2 && len(expr) <= 3 {
-		if key, ok := expr[1].(string); ok {
+		if expr[1].IsA(SymbolKind) {
+			key := expr[1].String()
 			if len(expr) == 3 {
 				var i Value
 				if i, err = evalValue(expr[2]); err == nil {
 					scope.Create(key, i)
 				}
 			} else {
-				scope.Create(key, nil)
+				scope.Create(key, Nil)
 			}
-			return key, err
+			return expr[1], err
 		}
 	}
-	return nil, fmt.Errorf("Ill-formed special form: %v", expr)
+	return Nil, fmt.Errorf("Ill-formed special form: %v", expr)
 }
