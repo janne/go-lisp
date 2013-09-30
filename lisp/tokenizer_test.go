@@ -15,16 +15,19 @@ func equalSlices(a, b []string) bool {
 }
 
 func TestTokenize(t *testing.T) {
-	var tests = map[string][]string{
-		"(define a 42)":            {"(", "define", "a", "42", ")"},
-		"\t(quote\n\t\t(a b c))  ": {"(", "quote", "(", "a", "b", "c", ")", ")"},
-		"hello ; dude\n\tworld":    {"hello", "world"},
+	var tests = []struct {
+		in  string
+		out []string
+	}{
+		{"(define a 42)", []string{"(", "define", "a", "42", ")"}},
+		{"\t(quote\n\t\t(a b c))  ", []string{"(", "quote", "(", "a", "b", "c", ")", ")"}},
+		{"hello ; dude\n\tworld", []string{"hello", "world"}},
 	}
 
-	for in, out := range tests {
-		x := Tokenize(in)
-		if !equalSlices(x, out) {
-			t.Errorf("Tokenize \"%v\" gives \"%v\", expected \"%v\"", in, x, out)
+	for _, test := range tests {
+		x := Tokenize(test.in)
+		if !equalSlices(x, test.out) {
+			t.Errorf("Tokenize \"%v\" gives \"%v\", expected \"%v\"", test.in, x, test.out)
 		}
 	}
 }

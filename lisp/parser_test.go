@@ -4,16 +4,19 @@ import "testing"
 import "fmt"
 
 func TestParse(t *testing.T) {
-	var tests = map[string]string{
-		"42":            "42",
-		"(+ (+ 1 2) 3)": "[+ [+ 1 2] 3]",
+	var tests = []struct {
+		in  string
+		out string
+	}{
+		{"42", "42"},
+		{"(+ (+ 1 2) 3)", "[+ [+ 1 2] 3]"},
 	}
-	for in, out := range tests {
-		tokens := Tokenize(in)
+	for _, test := range tests {
+		tokens := Tokenize(test.in)
 		parsed, _ := Parse(tokens)
 		result := fmt.Sprintf("%v", parsed)
-		if result != out {
-			t.Errorf("Parse \"%v\" gives \"%v\", expected \"%v\"", in, result, out)
+		if result != test.out {
+			t.Errorf("Parse \"%v\" gives \"%v\", expected \"%v\"", test.in, result, test.out)
 		}
 	}
 }
