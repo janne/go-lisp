@@ -11,8 +11,8 @@ func Parse(tokens []string) (Sexp, error) {
 	values := make(Sexp, 0)
 	for pos < len(tokens) {
 		t := tokens[pos]
-		if m, _ := regexp.MatchString("^\\d+$", t); m { // Number
-			if i, err := strconv.Atoi(t); err != nil {
+		if m, _ := regexp.MatchString("^(([0-9]+)?\\.)?[0-9]+$", t); m { // Number
+			if i, err := strconv.ParseFloat(t, 64); err != nil {
 				return nil, fmt.Errorf("Failed to convert number: %v", t)
 			} else {
 				values = append(values, NewValue(i))

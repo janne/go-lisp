@@ -52,7 +52,7 @@ func (Builtin) Display(vars ...Value) (Value, error) {
 }
 
 func (Builtin) Add(vars ...Value) (Value, error) {
-	var sum int
+	var sum float64
 	for _, v := range vars {
 		if v.IsA(NumberKind) {
 			sum += v.Number()

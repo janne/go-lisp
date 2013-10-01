@@ -2,6 +2,7 @@ package lisp
 
 import (
 	"fmt"
+	"strconv"
 )
 
 type Value struct {
@@ -29,6 +30,9 @@ func NewValue(from interface{}) Value {
 		v.Kind = SymbolKind
 	case int:
 		v.Kind = NumberKind
+		v.raw = float64(from.(int))
+	case float64:
+		v.Kind = NumberKind
 	case nil:
 		v.Kind = NilKind
 	case Sexp:
@@ -53,7 +57,11 @@ func (v Value) IsA(k Kind) bool {
 }
 
 func (v Value) String() string {
-	return fmt.Sprintf("%v", v.raw)
+	if v.IsA(NumberKind) {
+		return strconv.FormatFloat(v.raw.(float64), 'f', -1, 64)
+	} else {
+		return fmt.Sprintf("%v", v.raw)
+	}
 }
 
 func (v Value) Sexp() Sexp {
@@ -64,6 +72,6 @@ func (v Value) Proc() Proc {
 	return v.raw.(Proc)
 }
 
-func (v Value) Number() int {
-	return v.raw.(int)
+func (v Value) Number() float64 {
+	return v.raw.(float64)
 }
