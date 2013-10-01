@@ -1,8 +1,15 @@
-- Refactorings
-- Change []Value to Sexp
-- Add methods to Value and Sexp
-  - Break up Eval
-- Strings in Tokenize/Parse
+- Fix type handling in tokenizer/parser/value. Now string is regexped three times. Should only be done in Tokenizer
+- Store string representation in Value.raw, change type from interface{} to string
+- Improve output of display, now includes quotes
+- Add string builtins:
+    http://groups.csail.mit.edu/mac/ftpdir/scheme-7.4/doc-html/scheme_7.html#SEC61
+    string-concatenate...
+- Add list builtins:
+    http://groups.csail.mit.edu/mac/ftpdir/scheme-7.4/doc-html/scheme_8.html#SEC72
+    cons, car, cdr...
+- Macros
+	- http://www.willdonnelly.net/blog/scheme-syntax-rules/
+	- http://docs.racket-lang.org/guide/pattern-macros.html
 - Implement tapping into packages
   - Use pkgreflect to create maps
     - https://github.com/ungerik/pkgreflect
@@ -13,16 +20,11 @@
   - (-> (http (Get "http://example.com/")) (first) (Body))
   - (doto (http/Get "http://example.com/") (first) (Body))
   - Compare http://clojure.org/java_interop
-- Improve testing
-  - Test for error message in TestEvalFailures
-- Allow multiline expressions in interactive mode
 - Add short forms
   - Define abbrev form
     - (define (inc x) (+ x 1))
   - 'smth rather than (quote smth)?
-  - Macros
 - Support for modules
   - http://www.htus.org/Book/Staging/how-to-use-modules/
-- Floats
 - More support for Scheme
   - http://people.csail.mit.edu/jaffer/r5rs_toc.html
