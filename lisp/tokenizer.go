@@ -1,15 +1,8 @@
 package lisp
 
-import (
-	"regexp"
-	"strings"
-)
+import "regexp"
 
-func Tokenize(program string) []string {
-	program = strings.Replace(program, "(", " ( ", -1)
-	program = strings.Replace(program, ")", " ) ", -1)
+func Tokenize(program string) (result []string) {
 	program = regexp.MustCompile(";.*").ReplaceAllString(program, "")
-	program = strings.TrimSpace(program)
-	t := regexp.MustCompile("\\s+").Split(program, -1)
-	return t
+	return regexp.MustCompile(`("[^"]*"|\(|\)|[^\s()]+)`).FindAllString(program, -1)
 }
