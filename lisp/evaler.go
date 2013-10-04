@@ -52,7 +52,7 @@ func evalValue(input Value) (val Value, err error) {
 				}
 			}
 		}
-	case NumberKind:
+	case NumberKind, StringKind:
 		val = input
 	case SymbolKind:
 		sym := input.String()

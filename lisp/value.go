@@ -2,6 +2,7 @@ package lisp
 
 import (
 	"fmt"
+	"regexp"
 	"strconv"
 )
 
@@ -19,6 +20,7 @@ const (
 	NilKind
 	SymbolKind
 	NumberKind
+	StringKind
 	SexpKind
 	ProcKind
 )
@@ -27,7 +29,11 @@ func NewValue(from interface{}) Value {
 	v := Value{raw: from}
 	switch from.(type) {
 	case string:
-		v.Kind = SymbolKind
+		if m, _ := regexp.MatchString("^\\\"[^\"]*\\\"$", from.(string)); m {
+			v.Kind = StringKind
+		} else {
+			v.Kind = SymbolKind
+		}
 	case int:
 		v.Kind = NumberKind
 		v.raw = float64(from.(int))
@@ -57,9 +63,10 @@ func (v Value) IsA(k Kind) bool {
 }
 
 func (v Value) String() string {
-	if v.IsA(NumberKind) {
+	switch v.Kind {
+	case NumberKind:
 		return strconv.FormatFloat(v.raw.(float64), 'f', -1, 64)
-	} else {
+	default:
 		return fmt.Sprintf("%v", v.raw)
 	}
 }

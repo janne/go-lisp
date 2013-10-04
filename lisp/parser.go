@@ -18,6 +18,9 @@ func Parse(tokens []string) (Sexp, error) {
 				values = append(values, NewValue(i))
 				pos++
 			}
+		} else if m, _ := regexp.MatchString("^\\\"[^\"]*\\\"$", t); m { // String
+			values = append(values, NewValue(t))
+			pos++
 		} else if t == "(" { // Open parenthesis
 			start := pos + 1
 			end, err := findEnd(tokens, start)
