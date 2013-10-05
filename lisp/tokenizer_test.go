@@ -22,6 +22,10 @@ func TestTokenize(t *testing.T) {
 		{"(define a 42)", []string{"(", "define", "a", "42", ")"}},
 		{"\t(quote\n\t\t(a b c))  ", []string{"(", "quote", "(", "a", "b", "c", ")", ")"}},
 		{"hello ; dude\n\tworld", []string{"hello", "world"}},
+		{"test \"a string\"", []string{"test", "\"a string\""}},
+		{"\"only string\"", []string{"\"only string\""}},
+		{"\"string\\nwith\\\"escape\\tcharacters\"", []string{"\"string\\nwith\\\"escape\\tcharacters\""}},
+		{"\"hej\\\"hello\"", []string{"\"hej\\\"hello\""}},
 	}
 
 	for _, test := range tests {

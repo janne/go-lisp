@@ -29,7 +29,7 @@ func NewValue(from interface{}) Value {
 	v := Value{raw: from}
 	switch from.(type) {
 	case string:
-		if m, _ := regexp.MatchString("^\\\"[^\"]*\\\"$", from.(string)); m {
+		if m, _ := regexp.MatchString(`^"(\\.|[^"])*"$`, from.(string)); m {
 			v.Kind = StringKind
 		} else {
 			v.Kind = SymbolKind
