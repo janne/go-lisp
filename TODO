@@ -1,6 +1,10 @@
-- Fix type handling in tokenizer/parser/value. Now string is regexped three times. Should only be done in Tokenizer
-- Store string representation in Value.raw, change type from interface{} to string
-- Improve output of display, now includes quotes
+- Add support for Line/pos in error messages
+  - Store pos in token
+  - Store token in value
+  - Calculate line/pos lazily when outputting
+- Output "quoted" rather than unquoted strings in interactive mode
+  - Add "func (v Value) Inspect() string"
+    Returns v.token.val
 - Add string builtins:
     http://groups.csail.mit.edu/mac/ftpdir/scheme-7.4/doc-html/scheme_7.html#SEC61
     string-concatenate...
