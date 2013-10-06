@@ -15,11 +15,14 @@ func Parse(tokens []*Token) (Sexp, error) {
 			if i, err := strconv.ParseFloat(t.val, 64); err != nil {
 				return nil, fmt.Errorf("Failed to convert number: %v", t.val)
 			} else {
-				values = append(values, NewValue(i))
+				values = append(values, Value{NumberKind, i})
 				pos++
 			}
-		case stringType, symbolType:
-			values = append(values, NewValue(t.val))
+		case stringType:
+			values = append(values, Value{StringKind, t.val[1:len(t.val)-1]})
+			pos++
+		case symbolType:
+			values = append(values, Value{SymbolKind, t.val})
 			pos++
 		case openType:
 			start := pos + 1
@@ -31,7 +34,7 @@ func Parse(tokens []*Token) (Sexp, error) {
 			if err != nil {
 				return nil, err
 			}
-			values = append(values, NewValue(x))
+			values = append(values, Value{SexpKind, x})
 			pos = end + 1
 		case closeType:
 			return nil, fmt.Errorf("List was closed but not opened")

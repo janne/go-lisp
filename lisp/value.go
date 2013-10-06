@@ -2,7 +2,6 @@ package lisp
 
 import (
 	"fmt"
-	"regexp"
 	"strconv"
 )
 
@@ -11,7 +10,9 @@ type Value struct {
 	raw  interface{}
 }
 
-var Nil = NewValue(nil)
+var Nil = Value{NilKind, nil}
+var False = Value{SymbolKind, "false"}
+var True = Value{SymbolKind, "true"}
 
 type Kind uint
 
@@ -24,39 +25,6 @@ const (
 	SexpKind
 	ProcKind
 )
-
-func NewValue(from interface{}) Value {
-	v := Value{raw: from}
-	switch from.(type) {
-	case string:
-		if m, _ := regexp.MatchString(`^"(\\.|[^"])*"$`, from.(string)); m {
-			v.Kind = StringKind
-		} else {
-			v.Kind = SymbolKind
-		}
-	case int:
-		v.Kind = NumberKind
-		v.raw = float64(from.(int))
-	case float64:
-		v.Kind = NumberKind
-	case nil:
-		v.Kind = NilKind
-	case Sexp:
-		v.Kind = SexpKind
-	case Proc:
-		v.Kind = ProcKind
-	case bool:
-		v.Kind = SymbolKind
-		if from.(bool) {
-			v.raw = "true"
-		} else {
-			v.raw = "false"
-		}
-	default:
-		v.Kind = InvalidKind
-	}
-	return v
-}
 
 func (v Value) IsA(k Kind) bool {
 	return k == v.Kind

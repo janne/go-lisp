@@ -36,11 +36,11 @@ func TestScope(t *testing.T) {
 func TestEnv(t *testing.T) {
 	scope := NewScope()
 	scope.AddEnv()
-	if v1 := scope.Create("foo", NewValue("bar")); v1 != NewValue("bar") {
+	if v1 := scope.Create("foo", Value{SymbolKind, "bar"}); v1 != (Value{SymbolKind, "bar"}) {
 		t.Errorf("Env.Create should return bar but returned %v", v1)
 	}
 
-	if v2, ok := scope.Get("foo"); v2 != NewValue("bar") && ok {
+	if v2, ok := scope.Get("foo"); v2 != (Value{SymbolKind, "bar"}) && ok {
 		t.Errorf("Failed to Create and Get foo, got %v, %v", v2, ok)
 	}
 
@@ -50,11 +50,11 @@ func TestEnv(t *testing.T) {
 
 	scope.AddEnv()
 
-	if v3, ok := scope.Get("foo"); v3 != NewValue("bar") {
+	if v3, ok := scope.Get("foo"); v3 != (Value{SymbolKind, "bar"}) {
 		t.Errorf("Failed to Get foo in sub env, got %v, %v", v3, ok)
 	}
 
-	scope.Create("bar", NewValue("baz"))
+	scope.Create("bar", (Value{SymbolKind, "baz"}))
 
 	scope.DropEnv()
 	if _, ok := scope.Get("bar"); ok {

@@ -59,7 +59,7 @@ func evalValue(input Value) (val Value, err error) {
 		if v, ok := scope.Get(sym); ok {
 			val = v
 		} else if sym == "true" || sym == "false" {
-			val = NewValue(sym)
+			val = Value{SymbolKind, sym}
 		} else {
 			return Nil, fmt.Errorf("Unbound variable: %v", sym)
 		}
@@ -128,7 +128,7 @@ func ifForm(expr Sexp) (val Value, err error) {
 func lambdaForm(expr Sexp) (val Value, err error) {
 	if len(expr) > 2 {
 		params := expr[1].Sexp()
-		val = NewValue(Proc{params, expr[2:], scope.Dup()})
+		val = Value{ProcKind, Proc{params, expr[2:], scope.Dup()}}
 	} else {
 		err = fmt.Errorf("Ill-formed special form: %v", expr)
 	}

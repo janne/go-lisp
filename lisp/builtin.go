@@ -60,7 +60,7 @@ func (Builtin) Add(vars ...Value) (Value, error) {
 			return Nil, fmt.Errorf("Badly formatted arguments: %v", vars)
 		}
 	}
-	return NewValue(sum), nil
+	return Value{NumberKind, sum}, nil
 }
 
 func (Builtin) Sub(vars ...Value) (Value, error) {
@@ -75,7 +75,7 @@ func (Builtin) Sub(vars ...Value) (Value, error) {
 			return Nil, fmt.Errorf("Badly formatted arguments: %v", vars)
 		}
 	}
-	return NewValue(sum), nil
+	return Value{NumberKind, sum}, nil
 }
 
 func (Builtin) Mul(vars ...Value) (Value, error) {
@@ -90,7 +90,7 @@ func (Builtin) Mul(vars ...Value) (Value, error) {
 			return Nil, fmt.Errorf("Badly formatted arguments: %v", vars)
 		}
 	}
-	return NewValue(sum), nil
+	return Value{NumberKind, sum}, nil
 }
 
 func (Builtin) Gt(vars ...Value) (Value, error) {
@@ -100,10 +100,10 @@ func (Builtin) Gt(vars ...Value) (Value, error) {
 		if !v1.IsA(NumberKind) || !v2.IsA(NumberKind) {
 			return Nil, fmt.Errorf("Badly formatted arguments: %v", vars)
 		} else if !(v1.Number() > v2.Number()) {
-			return NewValue(false), nil
+			return False, nil
 		}
 	}
-	return NewValue(true), nil
+	return True, nil
 }
 
 func (Builtin) Lt(vars ...Value) (Value, error) {
@@ -113,10 +113,10 @@ func (Builtin) Lt(vars ...Value) (Value, error) {
 		if !v1.IsA(NumberKind) || !v2.IsA(NumberKind) {
 			return Nil, fmt.Errorf("Badly formatted arguments: %v", vars)
 		} else if !(v1.Number() < v2.Number()) {
-			return NewValue(false), nil
+			return False, nil
 		}
 	}
-	return NewValue(true), nil
+	return True, nil
 }
 
 func (Builtin) Gte(vars ...Value) (Value, error) {
@@ -126,10 +126,10 @@ func (Builtin) Gte(vars ...Value) (Value, error) {
 		if !v1.IsA(NumberKind) || !v2.IsA(NumberKind) {
 			return Nil, fmt.Errorf("Badly formatted arguments: %v", vars)
 		} else if !(v1.Number() >= v2.Number()) {
-			return NewValue(false), nil
+			return False, nil
 		}
 	}
-	return NewValue(true), nil
+	return True, nil
 }
 
 func (Builtin) Lte(vars ...Value) (Value, error) {
@@ -139,8 +139,8 @@ func (Builtin) Lte(vars ...Value) (Value, error) {
 		if !v1.IsA(NumberKind) || !v2.IsA(NumberKind) {
 			return Nil, fmt.Errorf("Badly formatted arguments: %v", vars)
 		} else if !(v1.Number() <= v2.Number()) {
-			return NewValue(false), nil
+			return False, nil
 		}
 	}
-	return NewValue(true), nil
+	return True, nil
 }
