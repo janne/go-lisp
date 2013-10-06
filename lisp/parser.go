@@ -19,7 +19,7 @@ func Parse(tokens []*Token) (Sexp, error) {
 				pos++
 			}
 		case stringType:
-			values = append(values, Value{StringKind, t.val[1:len(t.val)-1]})
+			values = append(values, Value{StringKind, t.val[1 : len(t.val)-1]})
 			pos++
 		case symbolType:
 			values = append(values, Value{SymbolKind, t.val})

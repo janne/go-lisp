@@ -5,7 +5,7 @@ import (
 )
 
 type Pattern struct {
-	typ   tokenType
+	typ    tokenType
 	regexp *regexp.Regexp
 }
 
