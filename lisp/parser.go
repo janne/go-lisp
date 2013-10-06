@@ -2,26 +2,26 @@ package lisp
 
 import (
 	"fmt"
-	"regexp"
 	"strconv"
 )
 
-func Parse(tokens []string) (Sexp, error) {
+func Parse(tokens []*Token) (Sexp, error) {
 	var pos int
 	values := make(Sexp, 0)
 	for pos < len(tokens) {
 		t := tokens[pos]
-		if m, _ := regexp.MatchString("^(([0-9]+)?\\.)?[0-9]+$", t); m { // Number
-			if i, err := strconv.ParseFloat(t, 64); err != nil {
-				return nil, fmt.Errorf("Failed to convert number: %v", t)
+		switch t.typ {
+		case numberType:
+			if i, err := strconv.ParseFloat(t.val, 64); err != nil {
+				return nil, fmt.Errorf("Failed to convert number: %v", t.val)
 			} else {
 				values = append(values, NewValue(i))
 				pos++
 			}
-		} else if m, _ := regexp.MatchString(`^"(\\.|[^"])*"$`, t); m { // String
-			values = append(values, NewValue(t))
+		case stringType, symbolType:
+			values = append(values, NewValue(t.val))
 			pos++
-		} else if t == "(" { // Open parenthesis
+		case openType:
 			start := pos + 1
 			end, err := findEnd(tokens, start)
 			if err != nil {
@@ -33,24 +33,22 @@ func Parse(tokens []string) (Sexp, error) {
 			}
 			values = append(values, NewValue(x))
 			pos = end + 1
-		} else if t == ")" { // Close parenthesis
+		case closeType:
 			return nil, fmt.Errorf("List was closed but not opened")
-		} else { // Symbol
-			values = append(values, NewValue(t))
-			pos++
 		}
 	}
 	return values, nil
 }
 
-func findEnd(tokens []string, start int) (int, error) {
+func findEnd(tokens []*Token, start int) (int, error) {
 	depth := 1
 
 	for i := start; i < len(tokens); i++ {
 		t := tokens[i]
-		if t == "(" {
+		switch t.typ {
+		case openType:
 			depth++
-		} else if t == ")" {
+		case closeType:
 			depth--
 		}
 		if depth == 0 {

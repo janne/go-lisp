@@ -2,12 +2,12 @@ package lisp
 
 import "testing"
 
-func equalSlices(a, b []string) bool {
+func equalSlices(a, b []*Token) bool {
 	if len(a) != len(b) {
 		return false
 	}
 	for i, v := range a {
-		if v != b[i] {
+		if v.val != b[i].val || v.typ != b[i].typ {
 			return false
 		}
 	}
@@ -17,15 +17,15 @@ func equalSlices(a, b []string) bool {
 func TestTokenize(t *testing.T) {
 	var tests = []struct {
 		in  string
-		out []string
+		out []*Token
 	}{
-		{"(define a 42)", []string{"(", "define", "a", "42", ")"}},
-		{"\t(quote\n\t\t(a b c))  ", []string{"(", "quote", "(", "a", "b", "c", ")", ")"}},
-		{"hello ; dude\n\tworld", []string{"hello", "world"}},
-		{"test \"a string\"", []string{"test", "\"a string\""}},
-		{"\"only string\"", []string{"\"only string\""}},
-		{"\"string\\nwith\\\"escape\\tcharacters\"", []string{"\"string\\nwith\\\"escape\\tcharacters\""}},
-		{"\"hej\\\"hello\"", []string{"\"hej\\\"hello\""}},
+		{"(define a 42)", []*Token{{openType, "("}, {symbolType, "define"}, {symbolType, "a"}, {numberType, "42"}, {closeType, ")"}}},
+		{"\t(quote\n\t\t(a b c))  ", []*Token{{openType, "("}, {symbolType, "quote"}, {openType, "("}, {symbolType, "a"}, {symbolType, "b"}, {symbolType, "c"}, {closeType, ")"}, {closeType, ")"}}},
+		{"hello ; dude\n\tworld", []*Token{{symbolType, "hello"}, {symbolType, "world"}}},
+		{"test \"a string\"", []*Token{{symbolType, "test"}, {stringType, "\"a string\""}}},
+		{"\"only string\"", []*Token{{stringType, "\"only string\""}}},
+		{"\"string\\nwith\\\"escape\\tcharacters\"", []*Token{{stringType, "\"string\\nwith\\\"escape\\tcharacters\""}}},
+		{"\"hej\\\"hello\"", []*Token{{stringType, "\"hej\\\"hello\""}}},
 	}
 
 	for _, test := range tests {
