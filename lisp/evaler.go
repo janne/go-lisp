@@ -2,18 +2,18 @@ package lisp
 
 import "fmt"
 
-func EvalString(line string) (string, error) {
+func EvalString(line string) (Value, error) {
 	tokenized := Tokenize(line)
 	parsed, err := Parse(tokenized)
 	if err != nil {
-		return "", err
+		return Nil, err
 	}
 	evaled, err := Eval(parsed)
 	if err != nil {
-		return "", err
+		return Nil, err
 	}
 	scope.Create("_", evaled)
-	return fmt.Sprintf("%v", evaled), nil
+	return evaled, nil
 }
 
 func Eval(expr Sexp) (val Value, err error) {
