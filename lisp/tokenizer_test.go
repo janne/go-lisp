@@ -19,13 +19,13 @@ func TestTokenize(t *testing.T) {
 		in  string
 		out []*Token
 	}{
-		{"(define a 42)", []*Token{{openType, "("}, {symbolType, "define"}, {symbolType, "a"}, {numberType, "42"}, {closeType, ")"}}},
-		{"\t(quote\n\t\t(a b c))  ", []*Token{{openType, "("}, {symbolType, "quote"}, {openType, "("}, {symbolType, "a"}, {symbolType, "b"}, {symbolType, "c"}, {closeType, ")"}, {closeType, ")"}}},
-		{"hello ; dude\n\tworld", []*Token{{symbolType, "hello"}, {symbolType, "world"}}},
-		{"test \"a string\"", []*Token{{symbolType, "test"}, {stringType, "\"a string\""}}},
-		{"\"only string\"", []*Token{{stringType, "\"only string\""}}},
-		{"\"string\\nwith\\\"escape\\tcharacters\"", []*Token{{stringType, "\"string\\nwith\\\"escape\\tcharacters\""}}},
-		{"\"hej\\\"hello\"", []*Token{{stringType, "\"hej\\\"hello\""}}},
+		{"(define a 42)", []*Token{{openToken, "("}, {symbolToken, "define"}, {symbolToken, "a"}, {numberToken, "42"}, {closeToken, ")"}}},
+		{"\t(quote\n\t\t(a b c))  ", []*Token{{openToken, "("}, {symbolToken, "quote"}, {openToken, "("}, {symbolToken, "a"}, {symbolToken, "b"}, {symbolToken, "c"}, {closeToken, ")"}, {closeToken, ")"}}},
+		{"hello ; dude\n\tworld", []*Token{{symbolToken, "hello"}, {symbolToken, "world"}}},
+		{"test \"a string\"", []*Token{{symbolToken, "test"}, {stringToken, "\"a string\""}}},
+		{"\"only string\"", []*Token{{stringToken, "\"only string\""}}},
+		{"\"string\\nwith\\\"escape\\tcharacters\"", []*Token{{stringToken, "\"string\\nwith\\\"escape\\tcharacters\""}}},
+		{"\"hej\\\"hello\"", []*Token{{stringToken, "\"hej\\\"hello\""}}},
 	}
 
 	for _, test := range tests {

@@ -27,8 +27,8 @@ func Eval(expr Sexp) (val Value, err error) {
 }
 
 func evalValue(input Value) (val Value, err error) {
-	switch input.Kind {
-	case SexpKind:
+	switch input.typ {
+	case sexpValue:
 		expr := input.Sexp()
 		if len(expr) > 0 {
 			switch expr[0].String() {
@@ -52,14 +52,14 @@ func evalValue(input Value) (val Value, err error) {
 				}
 			}
 		}
-	case NumberKind, StringKind:
+	case numberValue, stringValue:
 		val = input
-	case SymbolKind:
+	case symbolValue:
 		sym := input.String()
 		if v, ok := scope.Get(sym); ok {
 			val = v
 		} else if sym == "true" || sym == "false" {
-			val = Value{SymbolKind, sym}
+			val = Value{symbolValue, sym}
 		} else {
 			return Nil, fmt.Errorf("Unbound variable: %v", sym)
 		}
@@ -71,7 +71,7 @@ func evalValue(input Value) (val Value, err error) {
 
 func procForm(expr Sexp) (val Value, err error) {
 	if val, err = evalValue(expr[0]); err == nil {
-		if val.IsA(ProcKind) {
+		if val.IsA(procValue) {
 			var args []Value
 			for _, v := range expr[1:] {
 				if e, err := evalValue(v); err != nil {
@@ -115,7 +115,7 @@ func ifForm(expr Sexp) (val Value, err error) {
 	} else {
 		r, err := evalValue(expr[1])
 		if err == nil {
-			if !(r.IsA(SymbolKind) && r.String() == "false") && r != Nil && len(expr) > 2 {
+			if !(r.IsA(symbolValue) && r.String() == "false") && r != Nil && len(expr) > 2 {
 				val, err = evalValue(expr[2])
 			} else if len(expr) == 4 {
 				val, err = evalValue(expr[3])
@@ -128,7 +128,7 @@ func ifForm(expr Sexp) (val Value, err error) {
 func lambdaForm(expr Sexp) (val Value, err error) {
 	if len(expr) > 2 {
 		params := expr[1].Sexp()
-		val = Value{ProcKind, Proc{params, expr[2:], scope.Dup()}}
+		val = Value{procValue, Proc{params, expr[2:], scope.Dup()}}
 	} else {
 		err = fmt.Errorf("Ill-formed special form: %v", expr)
 	}
@@ -146,7 +146,7 @@ func quoteForm(expr Sexp) (val Value, err error) {
 
 func defineForm(expr Sexp) (val Value, err error) {
 	if len(expr) >= 2 && len(expr) <= 3 {
-		if expr[1].IsA(SymbolKind) {
+		if expr[1].IsA(symbolValue) {
 			key := expr[1].String()
 			if len(expr) == 3 {
 				var i Value

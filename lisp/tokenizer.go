@@ -17,24 +17,24 @@ type Token struct {
 }
 
 const (
-	whitespaceType tokenType = iota
-	commentType
-	stringType
-	numberType
-	openType
-	closeType
-	symbolType
+	whitespaceToken tokenType = iota
+	commentToken
+	stringToken
+	numberToken
+	openToken
+	closeToken
+	symbolToken
 )
 
 func patterns() []Pattern {
 	return []Pattern{
-		{whitespaceType, regexp.MustCompile(`^\s+`)},
-		{commentType, regexp.MustCompile(`^;.*`)},
-		{stringType, regexp.MustCompile(`^("(\\.|[^"])*")`)},
-		{numberType, regexp.MustCompile(`^((([0-9]+)?\.)?[0-9]+)`)},
-		{openType, regexp.MustCompile(`^(\()`)},
-		{closeType, regexp.MustCompile(`^(\))`)},
-		{symbolType, regexp.MustCompile(`^([^\s()]+)`)},
+		{whitespaceToken, regexp.MustCompile(`^\s+`)},
+		{commentToken, regexp.MustCompile(`^;.*`)},
+		{stringToken, regexp.MustCompile(`^("(\\.|[^"])*")`)},
+		{numberToken, regexp.MustCompile(`^((([0-9]+)?\.)?[0-9]+)`)},
+		{openToken, regexp.MustCompile(`^(\()`)},
+		{closeToken, regexp.MustCompile(`^(\))`)},
+		{symbolToken, regexp.MustCompile(`^([^\s()]+)`)},
 	}
 }
 

@@ -6,44 +6,44 @@ import (
 )
 
 type Value struct {
-	Kind Kind
-	raw  interface{}
+	typ valueType
+	val interface{}
 }
 
-var Nil = Value{NilKind, nil}
-var False = Value{SymbolKind, "false"}
-var True = Value{SymbolKind, "true"}
+var Nil = Value{nilValue, nil}
+var False = Value{symbolValue, "false"}
+var True = Value{symbolValue, "true"}
 
-type Kind uint
+type valueType uint
 
 const (
-	InvalidKind Kind = iota
-	NilKind
-	SymbolKind
-	NumberKind
-	StringKind
-	SexpKind
-	ProcKind
+	invalidValue valueType = iota
+	nilValue
+	symbolValue
+	numberValue
+	stringValue
+	sexpValue
+	procValue
 )
 
-func (v Value) IsA(k Kind) bool {
-	return k == v.Kind
+func (v Value) IsA(k valueType) bool {
+	return k == v.typ
 }
 
 func (v Value) String() string {
-	switch v.Kind {
-	case NumberKind:
-		return strconv.FormatFloat(v.raw.(float64), 'f', -1, 64)
+	switch v.typ {
+	case numberValue:
+		return strconv.FormatFloat(v.val.(float64), 'f', -1, 64)
 	default:
-		return fmt.Sprintf("%v", v.raw)
+		return fmt.Sprintf("%v", v.val)
 	}
 }
 
 func (v Value) Inspect() string {
-	switch v.Kind {
-	case StringKind:
-		return fmt.Sprintf(`"%v"`, v.raw)
-	case SexpKind:
+	switch v.typ {
+	case stringValue:
+		return fmt.Sprintf(`"%v"`, v.val)
+	case sexpValue:
 		return v.Inspect()
 	default:
 		return v.String()
@@ -51,13 +51,13 @@ func (v Value) Inspect() string {
 }
 
 func (v Value) Sexp() Sexp {
-	return v.raw.(Sexp)
+	return v.val.(Sexp)
 }
 
 func (v Value) Proc() Proc {
-	return v.raw.(Proc)
+	return v.val.(Proc)
 }
 
 func (v Value) Number() float64 {
-	return v.raw.(float64)
+	return v.val.(float64)
 }

@@ -11,20 +11,20 @@ func Parse(tokens []*Token) (Sexp, error) {
 	for pos < len(tokens) {
 		t := tokens[pos]
 		switch t.typ {
-		case numberType:
+		case numberToken:
 			if i, err := strconv.ParseFloat(t.val, 64); err != nil {
 				return nil, fmt.Errorf("Failed to convert number: %v", t.val)
 			} else {
-				values = append(values, Value{NumberKind, i})
+				values = append(values, Value{numberValue, i})
 				pos++
 			}
-		case stringType:
-			values = append(values, Value{StringKind, t.val[1 : len(t.val)-1]})
+		case stringToken:
+			values = append(values, Value{stringValue, t.val[1 : len(t.val)-1]})
 			pos++
-		case symbolType:
-			values = append(values, Value{SymbolKind, t.val})
+		case symbolToken:
+			values = append(values, Value{symbolValue, t.val})
 			pos++
-		case openType:
+		case openToken:
 			start := pos + 1
 			end, err := findEnd(tokens, start)
 			if err != nil {
@@ -34,9 +34,9 @@ func Parse(tokens []*Token) (Sexp, error) {
 			if err != nil {
 				return nil, err
 			}
-			values = append(values, Value{SexpKind, x})
+			values = append(values, Value{sexpValue, x})
 			pos = end + 1
-		case closeType:
+		case closeToken:
 			return nil, fmt.Errorf("List was closed but not opened")
 		}
 	}
@@ -49,9 +49,9 @@ func findEnd(tokens []*Token, start int) (int, error) {
 	for i := start; i < len(tokens); i++ {
 		t := tokens[i]
 		switch t.typ {
-		case openType:
+		case openToken:
 			depth++
-		case closeType:
+		case closeToken:
 			depth--
 		}
 		if depth == 0 {

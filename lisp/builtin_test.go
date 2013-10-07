@@ -3,11 +3,11 @@ package lisp
 import "testing"
 
 func num(i float64) Value {
-	return Value{NumberKind, i}
+	return Value{numberValue, i}
 }
 
 func TestAdd(t *testing.T) {
-	if !isBuiltin(Value{SymbolKind, "+"}) {
+	if !isBuiltin(Value{symbolValue, "+"}) {
 		t.Errorf("+ is not correcly setup")
 	}
 
