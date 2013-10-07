@@ -43,11 +43,11 @@ func runBuiltin(expr Sexp) (val Value, err error) {
 }
 
 func (Builtin) Display(vars ...Value) (Value, error) {
-	var interfaces []interface{}
-	for _, v := range vars {
-		interfaces = append(interfaces, v)
+	if len(vars) == 1 {
+		fmt.Println(vars[0])
+	} else {
+		return Nil, fmt.Errorf("Badly formatted arguments: %v", vars)
 	}
-	fmt.Println(interfaces...)
 	return Nil, nil
 }
 
