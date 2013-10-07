@@ -9,7 +9,7 @@ func TestParse(t *testing.T) {
 		out string
 	}{
 		{"42", "42"},
-		{"(+ (+ 1 2) 3)", "[+ [+ 1 2] 3]"},
+		{"(+ (+ 1 2) 3)", "(+ (+ 1 2) 3)"},
 	}
 	for _, test := range tests {
 		tokens := Tokenize(test.in)

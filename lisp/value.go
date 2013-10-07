@@ -39,6 +39,17 @@ func (v Value) String() string {
 	}
 }
 
+func (v Value) Inspect() string {
+	switch v.Kind {
+	case StringKind:
+		return fmt.Sprintf(`"%v"`, v.raw)
+	case SexpKind:
+		return v.Inspect()
+	default:
+		return v.String()
+	}
+}
+
 func (v Value) Sexp() Sexp {
 	return v.raw.(Sexp)
 }

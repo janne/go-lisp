@@ -2,9 +2,6 @@
   - Store pos in token
   - Store token in value
   - Calculate line/pos lazily when outputting
-- Output "quoted" rather than unquoted strings in interactive mode
-  - Add "func (v Value) Inspect() string"
-    Returns v.token.val
 - Add string builtins:
     http://groups.csail.mit.edu/mac/ftpdir/scheme-7.4/doc-html/scheme_7.html#SEC61
     string-concatenate...
