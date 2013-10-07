@@ -26,10 +26,6 @@ const (
 	procValue
 )
 
-func (v Value) IsA(k valueType) bool {
-	return k == v.typ
-}
-
 func (v Value) String() string {
 	switch v.typ {
 	case numberValue:

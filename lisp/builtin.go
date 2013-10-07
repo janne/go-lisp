@@ -54,7 +54,7 @@ func (Builtin) Display(vars ...Value) (Value, error) {
 func (Builtin) Add(vars ...Value) (Value, error) {
 	var sum float64
 	for _, v := range vars {
-		if v.IsA(numberValue) {
+		if v.typ == numberValue {
 			sum += v.Number()
 		} else {
 			return Nil, fmt.Errorf("Badly formatted arguments: %v", vars)
@@ -64,12 +64,12 @@ func (Builtin) Add(vars ...Value) (Value, error) {
 }
 
 func (Builtin) Sub(vars ...Value) (Value, error) {
-	if !vars[0].IsA(numberValue) {
+	if vars[0].typ != numberValue {
 		return Nil, fmt.Errorf("Badly formatted arguments: %v", vars)
 	}
 	sum := vars[0].Number()
 	for _, v := range vars[1:] {
-		if v.IsA(numberValue) {
+		if v.typ == numberValue {
 			sum -= v.Number()
 		} else {
 			return Nil, fmt.Errorf("Badly formatted arguments: %v", vars)
@@ -79,12 +79,12 @@ func (Builtin) Sub(vars ...Value) (Value, error) {
 }
 
 func (Builtin) Mul(vars ...Value) (Value, error) {
-	if !vars[0].IsA(numberValue) {
+	if vars[0].typ != numberValue {
 		return Nil, fmt.Errorf("Badly formatted arguments: %v", vars)
 	}
 	sum := vars[0].Number()
 	for _, v := range vars[1:] {
-		if v.IsA(numberValue) {
+		if v.typ == numberValue {
 			sum *= v.Number()
 		} else {
 			return Nil, fmt.Errorf("Badly formatted arguments: %v", vars)
@@ -97,7 +97,7 @@ func (Builtin) Gt(vars ...Value) (Value, error) {
 	for i := 1; i < len(vars); i++ {
 		v1 := vars[i-1]
 		v2 := vars[i]
-		if !v1.IsA(numberValue) || !v2.IsA(numberValue) {
+		if v1.typ != numberValue || v2.typ != numberValue {
 			return Nil, fmt.Errorf("Badly formatted arguments: %v", vars)
 		} else if !(v1.Number() > v2.Number()) {
 			return False, nil
@@ -110,7 +110,7 @@ func (Builtin) Lt(vars ...Value) (Value, error) {
 	for i := 1; i < len(vars); i++ {
 		v1 := vars[i-1]
 		v2 := vars[i]
-		if !v1.IsA(numberValue) || !v2.IsA(numberValue) {
+		if v1.typ != numberValue || v2.typ != numberValue {
 			return Nil, fmt.Errorf("Badly formatted arguments: %v", vars)
 		} else if !(v1.Number() < v2.Number()) {
 			return False, nil
@@ -123,7 +123,7 @@ func (Builtin) Gte(vars ...Value) (Value, error) {
 	for i := 1; i < len(vars); i++ {
 		v1 := vars[i-1]
 		v2 := vars[i]
-		if !v1.IsA(numberValue) || !v2.IsA(numberValue) {
+		if v1.typ != numberValue || v2.typ != numberValue {
 			return Nil, fmt.Errorf("Badly formatted arguments: %v", vars)
 		} else if !(v1.Number() >= v2.Number()) {
 			return False, nil
@@ -136,7 +136,7 @@ func (Builtin) Lte(vars ...Value) (Value, error) {
 	for i := 1; i < len(vars); i++ {
 		v1 := vars[i-1]
 		v2 := vars[i]
-		if !v1.IsA(numberValue) || !v2.IsA(numberValue) {
+		if v1.typ != numberValue || v2.typ != numberValue {
 			return Nil, fmt.Errorf("Badly formatted arguments: %v", vars)
 		} else if !(v1.Number() <= v2.Number()) {
 			return False, nil

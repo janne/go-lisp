@@ -71,7 +71,7 @@ func evalValue(input Value) (val Value, err error) {
 
 func procForm(expr Sexp) (val Value, err error) {
 	if val, err = evalValue(expr[0]); err == nil {
-		if val.IsA(procValue) {
+		if val.typ == procValue {
 			var args []Value
 			for _, v := range expr[1:] {
 				if e, err := evalValue(v); err != nil {
@@ -115,7 +115,7 @@ func ifForm(expr Sexp) (val Value, err error) {
 	} else {
 		r, err := evalValue(expr[1])
 		if err == nil {
-			if !(r.IsA(symbolValue) && r.String() == "false") && r != Nil && len(expr) > 2 {
+			if !(r.typ == symbolValue && r.String() == "false") && r != Nil && len(expr) > 2 {
 				val, err = evalValue(expr[2])
 			} else if len(expr) == 4 {
 				val, err = evalValue(expr[3])
@@ -146,7 +146,7 @@ func quoteForm(expr Sexp) (val Value, err error) {
 
 func defineForm(expr Sexp) (val Value, err error) {
 	if len(expr) >= 2 && len(expr) <= 3 {
-		if expr[1].IsA(symbolValue) {
+		if expr[1].typ == symbolValue {
 			key := expr[1].String()
 			if len(expr) == 3 {
 				var i Value
