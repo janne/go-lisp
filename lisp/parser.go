@@ -5,7 +5,7 @@ import (
 	"strconv"
 )
 
-func Parse(tokens []*Token) (Sexp, error) {
+func Parse(tokens Tokens) (Sexp, error) {
 	var pos int
 	values := make(Sexp, 0)
 	for pos < len(tokens) {
@@ -26,7 +26,7 @@ func Parse(tokens []*Token) (Sexp, error) {
 			pos++
 		case openToken:
 			start := pos + 1
-			end, err := findEnd(tokens, start)
+			end, err := tokens.findClose(start)
 			if err != nil {
 				return nil, err
 			}
@@ -41,22 +41,4 @@ func Parse(tokens []*Token) (Sexp, error) {
 		}
 	}
 	return values, nil
-}
-
-func findEnd(tokens []*Token, start int) (int, error) {
-	depth := 1
-
-	for i := start; i < len(tokens); i++ {
-		t := tokens[i]
-		switch t.typ {
-		case openToken:
-			depth++
-		case closeToken:
-			depth--
-		}
-		if depth == 0 {
-			return i, nil
-		}
-	}
-	return 0, fmt.Errorf("List was opened but not closed")
 }

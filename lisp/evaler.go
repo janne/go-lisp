@@ -3,8 +3,8 @@ package lisp
 import "fmt"
 
 func EvalString(line string) (Value, error) {
-	tokenized := Tokenize(line)
-	parsed, err := Parse(tokenized)
+	tokens := NewTokens(line)
+	parsed, err := Parse(tokens)
 	if err != nil {
 		return Nil, err
 	}

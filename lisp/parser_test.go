@@ -12,7 +12,7 @@ func TestParse(t *testing.T) {
 		{"(+ (+ 1 2) 3)", "(+ (+ 1 2) 3)"},
 	}
 	for _, test := range tests {
-		tokens := Tokenize(test.in)
+		tokens := NewTokens(test.in)
 		parsed, _ := Parse(tokens)
 		result := fmt.Sprintf("%v", parsed)
 		if result != test.out {
@@ -27,7 +27,7 @@ func TestParseFailures(t *testing.T) {
 	}
 
 	for _, in := range tests {
-		tokens := Tokenize(in)
+		tokens := NewTokens(in)
 		x, err := Parse(tokens)
 		if err == nil {
 			t.Errorf("Parse('%v') = '%v', want error", in, x)
