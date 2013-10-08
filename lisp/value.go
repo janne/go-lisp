@@ -14,7 +14,7 @@ var Nil = Value{nilValue, nil}
 var False = Value{symbolValue, "false"}
 var True = Value{symbolValue, "true"}
 
-type valueType uint
+type valueType uint8
 
 const (
 	invalidValue valueType = iota
