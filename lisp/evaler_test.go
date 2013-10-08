@@ -19,6 +19,7 @@ func TestEval(t *testing.T) {
 		{"(quote (1 2 3))", "(1 2 3)"},
 		{"(quote (1 (+ 1 2) 3))", "(1 (+ 1 2) 3)"},
 		{"(quote hej)", "hej"},
+		{"(quote (hej))", "(hej)"},
 		{"(if true (+ 1 1) 3)", "2"},
 		{"(if false 42 1)", "1"},
 		{"(if false 42)", "<nil>"},
@@ -55,7 +56,7 @@ func TestEvalFailures(t *testing.T) {
 	}{
 		{"hello", "Unbound variable: hello"},
 		{"(set! undefined 42)", "Unbound variable: undefined"},
-		{"(lambda (a))", "Ill-formed special form: (lambda a)"},
+		{"(lambda (a))", "Ill-formed special form: (lambda (a))"},
 		{"(1 2 3)", "The object 1 is not applicable"},
 		{"(1", "List was opened but not closed"},
 		{"(set! a)", "Ill-formed special form: (set! a)"},

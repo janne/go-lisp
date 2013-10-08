@@ -1,6 +1,9 @@
 package lisp
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func equalSlices(a, b Tokens) bool {
 	if len(a) != len(b) {
@@ -32,6 +35,34 @@ func TestNewTokens(t *testing.T) {
 		x := NewTokens(test.in)
 		if !equalSlices(x, test.out) {
 			t.Errorf("NewTokens \"%v\" gives \"%v\", expected \"%v\"", test.in, x, test.out)
+		}
+	}
+}
+
+func TestParse(t *testing.T) {
+	var tests = []struct {
+		in  string
+		out string
+	}{
+		{"42", "(42)"},
+		{"(+ (+ 1 2) 3)", "((+ (+ 1 2) 3))"},
+	}
+	for _, test := range tests {
+		parsed, _ := NewTokens(test.in).Parse()
+		result := fmt.Sprintf("%v", parsed.Inspect())
+		if result != test.out {
+			t.Errorf("Parse \"%v\" gives \"%v\", expected \"%v\"", test.in, result, test.out)
+		}
+	}
+}
+
+func TestParseFailures(t *testing.T) {
+	var tests = []string{
+		"(42",
+	}
+	for _, in := range tests {
+		if x, err := NewTokens(in).Parse(); err == nil {
+			t.Errorf("Parse('%v') = '%v', want error", in, x)
 		}
 	}
 }

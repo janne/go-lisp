@@ -40,7 +40,7 @@ func (v Value) Inspect() string {
 	case stringValue:
 		return fmt.Sprintf(`"%v"`, v.val)
 	case sexpValue:
-		return v.Inspect()
+		return v.val.(Sexp).Inspect()
 	default:
 		return v.String()
 	}
