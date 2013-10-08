@@ -42,7 +42,7 @@ func patterns() []Pattern {
 		{numberToken, regexp.MustCompile(`^((([0-9]+)?\.)?[0-9]+)`)},
 		{openToken, regexp.MustCompile(`^(\()`)},
 		{closeToken, regexp.MustCompile(`^(\))`)},
-		{symbolToken, regexp.MustCompile(`^([^\s()]+)`)},
+		{symbolToken, regexp.MustCompile(`^('|[^\s();]+)`)},
 	}
 }
 

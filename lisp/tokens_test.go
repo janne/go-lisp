@@ -29,6 +29,7 @@ func TestNewTokens(t *testing.T) {
 		{"\"only string\"", Tokens{{stringToken, "\"only string\""}}},
 		{"\"string\\nwith\\\"escape\\tcharacters\"", Tokens{{stringToken, "\"string\\nwith\\\"escape\\tcharacters\""}}},
 		{"\"hej\\\"hello\"", Tokens{{stringToken, "\"hej\\\"hello\""}}},
+		{"'hej", Tokens{{symbolToken, "'"}, {symbolToken, "hej"}}},
 	}
 
 	for _, test := range tests {
