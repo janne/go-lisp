@@ -61,7 +61,39 @@ func NewTokens(program string) (tokens Tokens) {
 	return
 }
 
+// Expand until there are no more expansions to do
+func (tokens Tokens) Expand() (result Tokens, err error) {
+	var updated bool
+	for i := 0; i < len(tokens); i++ {
+		var start int
+		quote := Token{symbolToken, "'"}
+		if *tokens[i] != quote {
+			result = append(result, tokens[i])
+		} else {
+			updated = true
+			for start = i + 1; *tokens[start] == quote; start++ {
+				result = append(result, tokens[start])
+			}
+			if tokens[i+1].typ == openToken {
+				if i, err = tokens.findClose(start + 1); err != nil {
+					return nil, err
+				}
+			} else {
+				i = start
+			}
+			result = append(result, &Token{openToken, "("}, &Token{symbolToken, "quote"})
+			result = append(result, tokens[start:i+1]...)
+			result = append(result, &Token{closeToken, ")"})
+		}
+	}
+	if updated {
+		result, err = result.Expand()
+	}
+	return
+}
+
 func (tokens Tokens) Parse() (values Sexp, err error) {
+	tokens, err = tokens.Expand()
 	var pos int
 	for pos < len(tokens) {
 		t := tokens[pos]
