@@ -61,15 +61,14 @@ func NewTokens(program string) (tokens Tokens) {
 	return
 }
 
-func (tokens Tokens) Parse() (Sexp, error) {
+func (tokens Tokens) Parse() (values Sexp, err error) {
 	var pos int
-	values := make(Sexp, 0)
 	for pos < len(tokens) {
 		t := tokens[pos]
 		switch t.typ {
 		case numberToken:
 			if i, err := strconv.ParseFloat(t.val, 64); err != nil {
-				return nil, fmt.Errorf("Failed to convert number: %v", t.val)
+				err = fmt.Errorf("Failed to convert number: %v", t.val)
 			} else {
 				values = append(values, Value{numberValue, i})
 				pos++
@@ -82,21 +81,21 @@ func (tokens Tokens) Parse() (Sexp, error) {
 			pos++
 		case openToken:
 			start := pos + 1
-			end, err := tokens.findClose(start)
-			if err != nil {
-				return nil, err
+			var sexp Sexp
+			var end int
+			if end, err = tokens.findClose(start); err != nil {
+				return
 			}
-			x, err := tokens[start:end].Parse()
-			if err != nil {
-				return nil, err
+			if sexp, err = tokens[start:end].Parse(); err != nil {
+				return
 			}
-			values = append(values, Value{sexpValue, x})
+			values = append(values, Value{sexpValue, sexp})
 			pos = end + 1
 		case closeToken:
-			return nil, fmt.Errorf("List was closed but not opened")
+			err = fmt.Errorf("List was closed but not opened")
 		}
 	}
-	return values, nil
+	return
 }
 
 func (t Tokens) findClose(start int) (int, error) {
