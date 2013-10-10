@@ -30,6 +30,8 @@ func (v Value) String() string {
 	switch v.typ {
 	case numberValue:
 		return strconv.FormatFloat(v.val.(float64), 'f', -1, 64)
+	case nilValue:
+		return "()"
 	default:
 		return fmt.Sprintf("%v", v.val)
 	}
