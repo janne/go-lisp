@@ -24,6 +24,7 @@ const (
 	stringValue
 	sexpValue
 	procValue
+	consValue
 )
 
 func (v Value) String() string {
