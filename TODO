@@ -1,3 +1,15 @@
+- Replace usage of Cons.Sexp() w/ Cons.Map and Cons.Len
+- Replace evalValue(Value) w/ Eval(Cons)
+- Use interface for Value.val instead of interface{}
+- Move tokens.Expand() to be called before Parse(), like tokens.Expand().Parse() sort of
+- Rename Sexp => Vector
+- Add cons command
+- Remove typecasting commands on Value
+- Remove naked returns
+- Add methods to Cons
+- Pairs
+	- http://groups.csail.mit.edu/mac/ftpdir/scheme-7.4/doc-html/scheme_8.html#SEC73
+	- http://docs.racket-lang.org/guide/Pairs__Lists__and_Racket_Syntax.html
 - Add support for Line/pos in error messages
   - Store pos in token
   - Store token in value
@@ -22,9 +34,10 @@
   - (doto (http/Get "http://example.com/") (first) (Body))
   - Compare http://clojure.org/java_interop
 - Add short forms
-  - Define abbrev form
-    - (define (inc x) (+ x 1))
-  - 'smth rather than (quote smth)?
+  - (define (inc x) (+ x 1)) => (define inc (lambda (x) (+ x 1)))
+  - (let ((a 1) (b 2)) (+ a b)) => ((lambda (a b) (+ a b)) 1 2)
+  - (list a b) => (cons a (cons b ()))
+  - (a . b) => (cons a b)
 - Support for modules
   - http://www.htus.org/Book/Staging/how-to-use-modules/
 - More support for Scheme
