@@ -8,8 +8,8 @@ func cons() Cons {
 	v1 := &Value{numberValue, 1.0}
 	v2 := &Value{numberValue, 2.0}
 	v3 := &Value{numberValue, 3.0}
-	c2 := &Value{consValue, Cons{v3, &Value{nilValue, nil}}}
-	c1 := &Value{consValue, Cons{v2, c2}}
+	c2 := &Value{consValue, &Cons{v3, &Value{nilValue, nil}}}
+	c1 := &Value{consValue, &Cons{v2, c2}}
 	return Cons{v1, c1}
 }
 

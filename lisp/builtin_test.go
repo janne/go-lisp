@@ -7,7 +7,7 @@ func num(i float64) Value {
 }
 
 func TestAdd(t *testing.T) {
-	if !isBuiltin(Value{symbolValue, "+"}) {
+	if !isBuiltin(Cons{&Value{symbolValue, "+"}, nil}) {
 		t.Errorf("+ is not correcly setup")
 	}
 

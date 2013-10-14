@@ -12,7 +12,7 @@ func (s Sexp) String() string {
 	for _, v := range s {
 		arr = append(arr, v.String())
 	}
-	return fmt.Sprintf(`(%v)`, strings.Join(arr, " "))
+	return fmt.Sprintf(`[%v]`, strings.Join(arr, " "))
 }
 
 func (s Sexp) Inspect() string {
@@ -20,5 +20,5 @@ func (s Sexp) Inspect() string {
 	for _, v := range s {
 		arr = append(arr, v.Inspect())
 	}
-	return fmt.Sprintf(`(%v)`, strings.Join(arr, " "))
+	return fmt.Sprintf(`[%v]`, strings.Join(arr, " "))
 }

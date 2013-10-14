@@ -49,6 +49,10 @@ func (v Value) Inspect() string {
 	}
 }
 
+func (v Value) Cons() Cons {
+	return v.val.(Cons)
+}
+
 func (v Value) Sexp() Sexp {
 	return v.val.(Sexp)
 }

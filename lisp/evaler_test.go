@@ -8,7 +8,7 @@ func TestEval(t *testing.T) {
 		in  string
 		out string
 	}{
-		{"()", "<nil>"},
+		{"()", "()"},
 		{"42", "42"},
 		{"42.0", "42"},
 		{"42.1", "42.1"},
@@ -63,6 +63,7 @@ func TestEvalFailures(t *testing.T) {
 		{"(1 2 3)", "The object 1 is not applicable"},
 		{"(1", "List was opened but not closed"},
 		{"(set! a)", "Ill-formed special form: (set! a)"},
+		{"(display . \"hej\")", "Combination must be a proper list: (display . \"hej\")"},
 	}
 
 	for _, test := range tests {

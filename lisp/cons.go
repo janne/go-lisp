@@ -10,11 +10,21 @@ type Cons struct {
 	cdr *Value
 }
 
+func (c Cons) List() bool {
+	return c.cdr.typ == consValue || c.cdr.typ == nilValue
+}
+
 func (c Cons) Sexp() (s Sexp) {
-	s = append(s, *c.car)
+	if c.car.typ == consValue {
+		cons := c.car.val.(*Cons)
+		s = append(s, cons.Sexp()...)
+	} else if *c.car != Nil {
+		s = append(s, *c.car)
+	}
 	if c.cdr.typ == consValue {
-		s = append(s, c.cdr.val.(Cons).Sexp()...)
-	} else if c.cdr.typ != nilValue {
+		cons := c.cdr.val.(*Cons)
+		s = append(s, cons.Sexp()...)
+	} else if *c.cdr != Nil {
 		s = append(s, *c.cdr)
 	}
 	return
