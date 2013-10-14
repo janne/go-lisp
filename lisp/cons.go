@@ -14,6 +14,40 @@ func (c Cons) List() bool {
 	return c.cdr.typ == consValue || c.cdr.typ == nilValue
 }
 
+func (c Cons) Map(f func (v Value) Value) []Value {
+	result := make([]Value, 0)
+	if *c.car != Nil {
+		if c.car.typ == consValue {
+			result = append(result, Value{sexpValue, c.car.Cons().Map(f)})
+		} else {
+			result = append(result, *c.car)
+		}
+		if *c.cdr != Nil {
+			if c.cdr.typ == consValue {
+				result = append(result, c.cdr.Cons().Map(f)...)
+			} else {
+				result = append(result, *c.cdr)
+			}
+		}
+	}
+	return result
+}
+
+func (c Cons) Len() int {
+	l := 0
+	if *c.car != Nil {
+		l++
+		if *c.cdr != Nil {
+			if c.cdr.typ == consValue {
+				l += c.cdr.Cons().Len()
+			} else {
+				l++
+			}
+		}
+	}
+	return l
+}
+
 func (c Cons) Sexp() (s Sexp) {
 	if c.car.typ == consValue {
 		cons := c.car.val.(*Cons)

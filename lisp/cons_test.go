@@ -13,6 +13,22 @@ func cons() Cons {
 	return Cons{v1, c1}
 }
 
+func TestConsMap(t *testing.T) {
+	s := cons().Map(func(v Value) Value {
+		return Value{numberValue, v.val.(float64) + 1}
+	})
+	if len(s) != 3 || s[0].val != 1.0 || s[1].val != 2.0 || s[2].val != 3.0 {
+		t.Errorf("Expected (1 2 3), got %v", s)
+	}
+}
+
+func TestConsLen(t *testing.T) {
+	got := cons().Len()
+	if got != 3 {
+		t.Errorf("Expected 3, got %v\n", got)
+	}
+}
+
 func TestConsSexp(t *testing.T) {
 	s := cons().Sexp()
 	if len(s) != 3 || s[0].val != 1.0 || s[1].val != 2.0 || s[2].val != 3.0 {
