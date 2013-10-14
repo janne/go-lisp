@@ -50,13 +50,13 @@ func (c Cons) Len() int {
 
 func (c Cons) Sexp() (s Sexp) {
 	if c.car.typ == consValue {
-		cons := c.car.val.(*Cons)
+		cons := c.car.Cons()
 		s = append(s, Value{sexpValue, cons.Sexp()})
 	} else if *c.car != Nil {
 		s = append(s, *c.car)
 	}
 	if c.cdr.typ == consValue {
-		cons := c.cdr.val.(*Cons)
+		cons := c.cdr.Cons()
 		s = append(s, cons.Sexp()...)
 	} else if *c.cdr != Nil {
 		s = append(s, *c.cdr)
