@@ -17,7 +17,7 @@ func (c Cons) List() bool {
 func (c Cons) Sexp() (s Sexp) {
 	if c.car.typ == consValue {
 		cons := c.car.val.(*Cons)
-		s = append(s, cons.Sexp()...)
+		s = append(s, Value{sexpValue, cons.Sexp()})
 	} else if *c.car != Nil {
 		s = append(s, *c.car)
 	}
