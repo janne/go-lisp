@@ -48,20 +48,10 @@ func (c Cons) Len() int {
 	return l
 }
 
-func (c Cons) Sexp() (s Sexp) {
-	if c.car.typ == consValue {
-		cons := c.car.Cons()
-		s = append(s, Value{sexpValue, cons.Sexp()})
-	} else if *c.car != Nil {
-		s = append(s, *c.car)
-	}
-	if c.cdr.typ == consValue {
-		cons := c.cdr.Cons()
-		s = append(s, cons.Sexp()...)
-	} else if *c.cdr != Nil {
-		s = append(s, *c.cdr)
-	}
-	return
+func (c Cons) Sexp() Sexp {
+	return c.Map(func (v Value) Value {
+		return v
+	})
 }
 
 func (c Cons) String() string {
