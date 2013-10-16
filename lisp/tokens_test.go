@@ -48,10 +48,13 @@ func TestParse(t *testing.T) {
 		{"(+ (+ 1 2) 3)", "((+ (+ 1 2) 3))"},
 	}
 	for _, test := range tests {
-		parsed, _ := NewTokens(test.in).Parse()
-		result := fmt.Sprintf("%v", parsed.Inspect())
-		if result != test.out {
-			t.Errorf("Parse \"%v\" gives \"%v\", expected \"%v\"", test.in, result, test.out)
+		if parsed, err := NewTokens(test.in).Parse(); err != nil {
+			t.Errorf("%v\n", err)
+		} else {
+			result := fmt.Sprintf("%v", parsed.String())
+			if result != test.out {
+				t.Errorf("Parse \"%v\" gives \"%v\", expected \"%v\"", test.in, result, test.out)
+			}
 		}
 	}
 }

@@ -15,43 +15,48 @@ func EvalString(line string) (Value, error) {
 	return evaled, nil
 }
 
-func Eval(expr Sexp) (val Value, err error) {
-	for _, t := range expr {
-		val, err = evalValue(t)
-		if err != nil {
-			break
+func Eval(cons Cons) (val Value, err error) {
+	if cons.List() {
+		if v, err := evalValue(*cons.car); err != nil {
+			return Nil, err
+		} else if *cons.cdr == Nil {
+			return v, nil
+		} else {
+			return Eval(cons.cdr.Cons())
 		}
+	} else {
+		return Value{consValue, cons}, nil
 	}
-	return
 }
 
 func evalValue(input Value) (val Value, err error) {
 	switch input.typ {
-	case sexpValue:
-		expr := input.Sexp()
-		if len(expr) > 0 {
-			switch expr[0].String() {
-			case "quote":
-				return quoteForm(expr)
-			case "if":
-				return ifForm(expr)
-			case "set!":
-				return setForm(expr)
-			case "define":
-				return defineForm(expr)
-			case "lambda":
-				return lambdaForm(expr)
-			case "begin":
-				return beginForm(expr)
-			default:
-				if isBuiltin(expr[0]) {
-					return runBuiltin(expr)
-				} else {
-					return procForm(expr)
-				}
+	case consValue:
+		cons := input.Cons()
+		if !cons.List() {
+			return Nil, fmt.Errorf("Combination must be a proper list: %v", cons)
+		}
+		switch cons.car.String() {
+		case "quote":
+			return quoteForm(cons)
+		case "if":
+			return ifForm(cons)
+		case "set!":
+			return setForm(cons)
+		case "define":
+			return defineForm(cons)
+		case "lambda":
+			return lambdaForm(cons)
+		case "begin":
+			return beginForm(cons)
+		default:
+			if isBuiltin(cons) {
+				return runBuiltin(cons)
+			} else {
+				return procForm(cons)
 			}
 		}
-	case numberValue, stringValue:
+	case numberValue, stringValue, sexpValue, nilValue:
 		val = input
 	case symbolValue:
 		sym := input.String()
@@ -68,18 +73,17 @@ func evalValue(input Value) (val Value, err error) {
 	return
 }
 
-func procForm(expr Sexp) (val Value, err error) {
-	if val, err = evalValue(expr[0]); err == nil {
+func procForm(cons Cons) (val Value, err error) {
+	if val, err = evalValue(*cons.car); err == nil {
 		if val.typ == procValue {
-			var args []Value
-			for _, v := range expr[1:] {
-				if e, err := evalValue(v); err != nil {
-					return Nil, err
-				} else {
-					args = append(args, e)
-				}
+			var args Sexp
+			if args, err = cons.cdr.Cons().Map(func(v Value) (Value, error) {
+				return evalValue(v)
+			}); err != nil {
+				return
+			} else {
+				val, err = val.Proc().Call(args)
 			}
-			val, err = val.Proc().Call(args)
 		} else {
 			err = fmt.Errorf("The object %v is not applicable", val)
 		}
@@ -87,11 +91,12 @@ func procForm(expr Sexp) (val Value, err error) {
 	return
 }
 
-func beginForm(expr Sexp) (val Value, err error) {
-	return Eval(expr[1:])
+func beginForm(cons Cons) (val Value, err error) {
+	return Eval(cons.cdr.Cons())
 }
 
-func setForm(expr Sexp) (val Value, err error) {
+func setForm(cons Cons) (val Value, err error) {
+	expr := cons.Sexp()
 	if len(expr) == 3 {
 		key := expr[1].String()
 		if _, ok := scope.Get(key); ok {
@@ -103,12 +108,13 @@ func setForm(expr Sexp) (val Value, err error) {
 			err = fmt.Errorf("Unbound variable: %v", key)
 		}
 	} else {
-		err = fmt.Errorf("Ill-formed special form: %v", expr)
+		err = fmt.Errorf("Ill-formed special form: %v", cons)
 	}
 	return
 }
 
-func ifForm(expr Sexp) (val Value, err error) {
+func ifForm(cons Cons) (val Value, err error) {
+	expr := cons.Sexp()
 	if len(expr) < 3 || len(expr) > 4 {
 		err = fmt.Errorf("Ill-formed special form: %v", expr)
 	} else {
@@ -124,26 +130,36 @@ func ifForm(expr Sexp) (val Value, err error) {
 	return
 }
 
-func lambdaForm(expr Sexp) (val Value, err error) {
-	if len(expr) > 2 {
-		params := expr[1].Sexp()
-		val = Value{procValue, Proc{params, expr[2:], scope.Dup()}}
+func lambdaForm(cons Cons) (val Value, err error) {
+	if cons.cdr.typ == consValue {
+		lambda := cons.cdr.Cons()
+		if (lambda.car.typ == consValue || lambda.car.typ == nilValue) && lambda.cdr.typ == consValue {
+			params := lambda.car.Cons().Sexp()
+			val = Value{procValue, Proc{params, lambda.cdr.Cons(), scope.Dup()}}
+		} else {
+			err = fmt.Errorf("Ill-formed special form: %v", cons)
+		}
 	} else {
-		err = fmt.Errorf("Ill-formed special form: %v", expr)
+		err = fmt.Errorf("Ill-formed special form: %v", cons)
 	}
 	return
 }
 
-func quoteForm(expr Sexp) (val Value, err error) {
-	if len(expr) == 2 {
-		val = expr[1]
+func quoteForm(cons Cons) (val Value, err error) {
+	if cons.cdr != nil {
+		if *cons.cdr.Cons().cdr == Nil {
+			val = *cons.cdr.Cons().car
+		} else {
+			val = Value{consValue, cons}
+		}
 	} else {
-		err = fmt.Errorf("Ill-formed special form: %v", expr)
+		err = fmt.Errorf("Ill-formed special form: %v", cons)
 	}
 	return
 }
 
-func defineForm(expr Sexp) (val Value, err error) {
+func defineForm(cons Cons) (val Value, err error) {
+	expr := cons.Sexp()
 	if len(expr) >= 2 && len(expr) <= 3 {
 		if expr[1].typ == symbolValue {
 			key := expr[1].String()

@@ -92,36 +92,49 @@ func (tokens Tokens) Expand() (result Tokens, err error) {
 	return
 }
 
-func (tokens Tokens) Parse() (values Sexp, err error) {
+func (tokens Tokens) Parse() (cons Cons, err error) {
 	tokens, err = tokens.Expand()
 	var pos int
+	var current *Cons
 	for pos < len(tokens) {
+		if current == nil {
+			cons = Cons{&Nil, &Nil}
+			current = &cons
+		} else {
+			previous_current := current
+			current = &Cons{&Nil, &Nil}
+			previous_current.cdr = &Value{consValue, current}
+		}
 		t := tokens[pos]
 		switch t.typ {
 		case numberToken:
 			if i, err := strconv.ParseFloat(t.val, 64); err != nil {
 				err = fmt.Errorf("Failed to convert number: %v", t.val)
 			} else {
-				values = append(values, Value{numberValue, i})
+				current.car = &Value{numberValue, i}
 				pos++
 			}
 		case stringToken:
-			values = append(values, Value{stringValue, t.val[1 : len(t.val)-1]})
+			current.car = &Value{stringValue, t.val[1 : len(t.val)-1]}
 			pos++
 		case symbolToken:
-			values = append(values, Value{symbolValue, t.val})
+			current.car = &Value{symbolValue, t.val}
 			pos++
 		case openToken:
+			var nested Cons
 			start := pos + 1
-			var sexp Sexp
 			var end int
 			if end, err = tokens.findClose(start); err != nil {
 				return
 			}
-			if sexp, err = tokens[start:end].Parse(); err != nil {
-				return
+			if start == end {
+				current.car = &Nil
+			} else {
+				if nested, err = tokens[start:end].Parse(); err != nil {
+					return
+				}
+				current.car = &Value{consValue, &nested}
 			}
-			values = append(values, Value{sexpValue, sexp})
 			pos = end + 1
 		case closeToken:
 			err = fmt.Errorf("List was closed but not opened")

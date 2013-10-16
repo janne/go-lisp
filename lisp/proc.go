@@ -4,7 +4,7 @@ import "fmt"
 
 type Proc struct {
 	params Sexp
-	body   Sexp
+	body   Cons
 	scope  *Scope
 }
 

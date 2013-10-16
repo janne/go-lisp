@@ -8,7 +8,7 @@ func TestEval(t *testing.T) {
 		in  string
 		out string
 	}{
-		{"()", "<nil>"},
+		{"()", "()"},
 		{"42", "42"},
 		{"42.0", "42"},
 		{"42.1", "42.1"},

@@ -18,23 +18,22 @@ var builtin_commands = map[string]string{
 	"display": "Display",
 }
 
-func isBuiltin(c Value) bool {
-	s := c.String()
+func isBuiltin(cons Cons) bool {
+	s := cons.car.String()
 	if _, ok := builtin_commands[s]; ok {
 		return true
 	}
 	return false
 }
 
-func runBuiltin(expr Sexp) (val Value, err error) {
-	cmd := builtin_commands[expr[0].String()]
+func runBuiltin(cons Cons) (val Value, err error) {
+	cmd := builtin_commands[cons.car.String()]
+	vars, err := cons.cdr.Cons().Map(func (v Value) (Value, error) {
+		return evalValue(v)
+	})
 	values := []reflect.Value{}
-	for _, i := range expr[1:] {
-		if value, err := evalValue(i); err != nil {
-			return Nil, err
-		} else {
-			values = append(values, reflect.ValueOf(value))
-		}
+	for _, v := range vars {
+		values = append(values, reflect.ValueOf(v))
 	}
 	result := reflect.ValueOf(&builtin).MethodByName(cmd).Call(values)
 	val = result[0].Interface().(Value)

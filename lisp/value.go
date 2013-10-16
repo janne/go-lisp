@@ -24,6 +24,7 @@ const (
 	stringValue
 	sexpValue
 	procValue
+	consValue
 )
 
 func (v Value) String() string {
@@ -45,6 +46,14 @@ func (v Value) Inspect() string {
 		return v.val.(Sexp).Inspect()
 	default:
 		return v.String()
+	}
+}
+
+func (v Value) Cons() Cons {
+	if v.typ == consValue {
+		return *v.val.(*Cons)
+	} else {
+		return Cons{&v, &Nil}
 	}
 }
 
