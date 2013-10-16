@@ -28,14 +28,12 @@ func isBuiltin(cons Cons) bool {
 
 func runBuiltin(cons Cons) (val Value, err error) {
 	cmd := builtin_commands[cons.car.String()]
-	vars := cons.cdr.Cons().Sexp()
+	vars, err := cons.cdr.Cons().Map(func (v Value) (Value, error) {
+		return evalValue(v)
+	})
 	values := []reflect.Value{}
-	for _, i := range vars {
-		if value, err := evalValue(i); err != nil {
-			return Nil, err
-		} else {
-			values = append(values, reflect.ValueOf(value))
-		}
+	for _, v := range vars {
+		values = append(values, reflect.ValueOf(v))
 	}
 	result := reflect.ValueOf(&builtin).MethodByName(cmd).Call(values)
 	val = result[0].Interface().(Value)
