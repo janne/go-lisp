@@ -65,10 +65,8 @@ func (c Cons) Sexp() Sexp {
 
 func (c Cons) String() string {
 	arr := []string{}
-	arr = append(arr, c.car.String())
-	if c.cdr.typ != sexpValue {
-		arr = append(arr, ".")
+	for _, v := range c.Sexp() {
+		arr = append(arr, v.String())
 	}
-	arr = append(arr, c.cdr.String())
 	return fmt.Sprintf(`(%v)`, strings.Join(arr, " "))
 }

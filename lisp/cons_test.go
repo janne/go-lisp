@@ -37,7 +37,7 @@ func TestConsSexp(t *testing.T) {
 }
 
 func TestConsString(t *testing.T) {
-	expected := "(1 . (2 . (3 . ())))"
+	expected := "(1 2 3)"
 	s := cons().String()
 	if s != expected {
 		t.Errorf("Cons.String() failed. Expected %v, got %v", expected, s)
