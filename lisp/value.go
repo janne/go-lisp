@@ -50,7 +50,11 @@ func (v Value) Inspect() string {
 }
 
 func (v Value) Cons() Cons {
-	return *v.val.(*Cons)
+	if v.typ == consValue {
+		return *v.val.(*Cons)
+	} else {
+		return Cons{&v, &Nil}
+	}
 }
 
 func (v Value) Sexp() Sexp {
