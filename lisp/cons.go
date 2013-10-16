@@ -14,23 +14,31 @@ func (c Cons) List() bool {
 	return c.cdr.typ == consValue || c.cdr.typ == nilValue
 }
 
-func (c Cons) Map(f func (v Value) Value) []Value {
+func (c Cons) Map(f func (v Value) (Value, error)) ([]Value, error) {
 	result := make([]Value, 0)
 	if *c.car != Nil {
-		if c.car.typ == consValue {
-			result = append(result, Value{sexpValue, c.car.Cons().Map(f)})
+		if value, err := f(*c.car); err != nil {
+			return nil, err
 		} else {
-			result = append(result, *c.car)
+			result = append(result, value)
 		}
 		if *c.cdr != Nil {
 			if c.cdr.typ == consValue {
-				result = append(result, c.cdr.Cons().Map(f)...)
+				if values, err := c.cdr.Cons().Map(f); err != nil {
+					return nil, err
+				} else {
+					result = append(result, values...)
+				}
 			} else {
-				result = append(result, *c.cdr)
+				if value, err := f(*c.cdr); err != nil {
+					return nil, err
+				} else {
+					result = append(result, value)
+				}
 			}
 		}
 	}
-	return result
+	return result, nil
 }
 
 func (c Cons) Len() int {
@@ -49,9 +57,10 @@ func (c Cons) Len() int {
 }
 
 func (c Cons) Sexp() Sexp {
-	return c.Map(func (v Value) Value {
-		return v
+	v, _ := c.Map(func (v Value) (Value, error) {
+		return v, nil
 	})
+	return v
 }
 
 func (c Cons) String() string {

@@ -14,10 +14,10 @@ func cons() Cons {
 }
 
 func TestConsMap(t *testing.T) {
-	s := cons().Map(func(v Value) Value {
-		return Value{numberValue, v.val.(float64) + 1}
+	s, _ := cons().Map(func(v Value) (Value, error) {
+		return Value{numberValue, v.val.(float64) + 1}, nil
 	})
-	if len(s) != 3 || s[0].val != 1.0 || s[1].val != 2.0 || s[2].val != 3.0 {
+	if len(s) != 3 || s[0].val != 2.0 || s[1].val != 3.0 || s[2].val != 4.0 {
 		t.Errorf("Expected (1 2 3), got %v", s)
 	}
 }
