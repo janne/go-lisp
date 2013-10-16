@@ -76,15 +76,14 @@ func evalValue(input Value) (val Value, err error) {
 func procForm(cons Cons) (val Value, err error) {
 	if val, err = evalValue(*cons.car); err == nil {
 		if val.typ == procValue {
-			var args []Value
-			for _, v := range cons.cdr.Sexp() {
-				if e, err := evalValue(v); err != nil {
-					return Nil, err
-				} else {
-					args = append(args, e)
-				}
+			var args Sexp
+			if args, err = cons.cdr.Cons().Map(func(v Value) (Value, error) {
+				return evalValue(v)
+			}); err != nil {
+				return
+			} else {
+				val, err = val.Proc().Call(args)
 			}
-			val, err = val.Proc().Call(args)
 		} else {
 			err = fmt.Errorf("The object %v is not applicable", val)
 		}
@@ -93,7 +92,7 @@ func procForm(cons Cons) (val Value, err error) {
 }
 
 func beginForm(cons Cons) (val Value, err error) {
-	return Eval(cons.cdr.val.(Cons))
+	return Eval(cons.cdr.Cons())
 }
 
 func setForm(cons Cons) (val Value, err error) {
@@ -109,7 +108,7 @@ func setForm(cons Cons) (val Value, err error) {
 			err = fmt.Errorf("Unbound variable: %v", key)
 		}
 	} else {
-		err = fmt.Errorf("Ill-formed special form: %v", expr)
+		err = fmt.Errorf("Ill-formed special form: %v", cons)
 	}
 	return
 }
@@ -133,9 +132,13 @@ func ifForm(cons Cons) (val Value, err error) {
 
 func lambdaForm(cons Cons) (val Value, err error) {
 	if cons.cdr.typ == consValue {
-		lambda := cons.cdr.val.(Cons)
-		params := lambda.car.Sexp()
-		val = Value{procValue, Proc{params, lambda.cdr.val.(Cons), scope.Dup()}}
+		lambda := cons.cdr.Cons()
+		if (lambda.car.typ == consValue || lambda.car.typ == nilValue) && lambda.cdr.typ == consValue {
+			params := lambda.car.Cons().Sexp()
+			val = Value{procValue, Proc{params, lambda.cdr.Cons(), scope.Dup()}}
+		} else {
+			err = fmt.Errorf("Ill-formed special form: %v", cons)
+		}
 	} else {
 		err = fmt.Errorf("Ill-formed special form: %v", cons)
 	}
@@ -144,7 +147,11 @@ func lambdaForm(cons Cons) (val Value, err error) {
 
 func quoteForm(cons Cons) (val Value, err error) {
 	if cons.cdr != nil {
-		val = *cons.cdr
+		if *cons.cdr.Cons().cdr == Nil {
+			val = *cons.cdr.Cons().car
+		} else {
+			val = Value{consValue, cons}
+		}
 	} else {
 		err = fmt.Errorf("Ill-formed special form: %v", cons)
 	}
