@@ -25,7 +25,7 @@ func TestEval(t *testing.T) {
 		{"(quote (hej))", "(hej)"},
 		{"(if true (+ 1 1) 3)", "2"},
 		{"(if false 42 1)", "1"},
-		{"(if false 42)", "<nil>"},
+		{"(if false 42)", "()"},
 		{"(begin (define x) (if x 1 2))", "2"},
 		{"(define r 3)", "r"},
 		{"(begin 5 (+ 3 4))", "7"},

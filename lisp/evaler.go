@@ -115,6 +115,7 @@ func setForm(cons Cons) (val Value, err error) {
 
 func ifForm(cons Cons) (val Value, err error) {
 	expr := cons.Sexp()
+	val = Nil
 	if len(expr) < 3 || len(expr) > 4 {
 		err = fmt.Errorf("Ill-formed special form: %v", expr)
 	} else {
