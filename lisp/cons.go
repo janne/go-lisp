@@ -46,11 +46,7 @@ func (c Cons) Len() int {
 	if *c.car != Nil {
 		l++
 		if *c.cdr != Nil {
-			if c.cdr.typ == consValue {
-				l += c.cdr.Cons().Len()
-			} else {
-				l++
-			}
+			l += c.cdr.Cons().Len()
 		}
 	}
 	return l
