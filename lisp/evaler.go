@@ -16,13 +16,17 @@ func EvalString(line string) (Value, error) {
 }
 
 func Eval(cons Cons) (val Value, err error) {
-	for _, t := range cons.Sexp() {
-		val, err = evalValue(t)
-		if err != nil {
-			break
+	if cons.List() {
+		if v, err := evalValue(*cons.car); err != nil {
+			return Nil, err
+		} else if *cons.cdr == Nil {
+			return v, nil
+		} else {
+			return Eval(cons.cdr.Cons())
 		}
+	} else {
+		return Value{consValue, cons}, nil
 	}
-	return
 }
 
 func evalValue(input Value) (val Value, err error) {
