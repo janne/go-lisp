@@ -40,7 +40,7 @@ func Repl() {
 	expr := ""
 	for {
 		if expr == "" {
-			fmt.Printf("> ")
+			fmt.Printf("\n> ")
 		}
 		line, _ := reader.ReadString('\n')
 		expr = fmt.Sprintf("%v%v", expr, line)
@@ -54,7 +54,11 @@ func Repl() {
 				if response, err := lisp.EvalString(expr); err != nil {
 					fmt.Printf("ERROR: %v\n", err)
 				} else {
-					fmt.Printf("=> %v\n", response.Inspect())
+					if response == lisp.Nil {
+						fmt.Println(";Unspecified return value")
+					} else {
+						fmt.Printf(";Value: %v\n", response.Inspect())
+					}
 				}
 			}
 			expr = ""
