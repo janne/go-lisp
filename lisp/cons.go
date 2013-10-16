@@ -16,26 +16,16 @@ func (c Cons) List() bool {
 
 func (c Cons) Map(f func (v Value) (Value, error)) ([]Value, error) {
 	result := make([]Value, 0)
-	if *c.car != Nil {
-		if value, err := f(*c.car); err != nil {
+	if value, err := f(*c.car); err != nil {
+		return nil, err
+	} else {
+		result = append(result, value)
+	}
+	if *c.cdr != Nil {
+		if values, err := c.cdr.Cons().Map(f); err != nil {
 			return nil, err
 		} else {
-			result = append(result, value)
-		}
-		if *c.cdr != Nil {
-			if c.cdr.typ == consValue {
-				if values, err := c.cdr.Cons().Map(f); err != nil {
-					return nil, err
-				} else {
-					result = append(result, values...)
-				}
-			} else {
-				if value, err := f(*c.cdr); err != nil {
-					return nil, err
-				} else {
-					result = append(result, value)
-				}
-			}
+			result = append(result, values...)
 		}
 	}
 	return result, nil
