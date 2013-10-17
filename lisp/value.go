@@ -35,22 +35,22 @@ func (v Value) Eval() (val Value, err error) {
 		}
 		switch cons.car.String() {
 		case "quote":
-			return quoteForm(cons)
+			return cons.quoteForm()
 		case "if":
-			return ifForm(cons)
+			return cons.ifForm()
 		case "set!":
-			return setForm(cons)
+			return cons.setForm()
 		case "define":
-			return defineForm(cons)
+			return cons.defineForm()
 		case "lambda":
-			return lambdaForm(cons)
+			return cons.lambdaForm()
 		case "begin":
-			return beginForm(cons)
+			return cons.beginForm()
 		default:
-			if isBuiltin(cons) {
-				return runBuiltin(cons)
+			if cons.isBuiltin() {
+				return cons.runBuiltin()
 			} else {
-				return procForm(cons)
+				return cons.procForm()
 			}
 		}
 	case numberValue, stringValue, vectorValue, nilValue:

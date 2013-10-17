@@ -1,7 +1,6 @@
 package lisp
 
 import "fmt"
-import "reflect"
 
 type Builtin struct{}
 
@@ -16,29 +15,6 @@ var builtin_commands = map[string]string{
 	">=":      "Gte",
 	"<=":      "Lte",
 	"display": "Display",
-}
-
-func isBuiltin(cons Cons) bool {
-	s := cons.car.String()
-	if _, ok := builtin_commands[s]; ok {
-		return true
-	}
-	return false
-}
-
-func runBuiltin(cons Cons) (val Value, err error) {
-	cmd := builtin_commands[cons.car.String()]
-	vars, err := cons.cdr.Cons().Map(func (v Value) (Value, error) {
-		return v.Eval()
-	})
-	values := []reflect.Value{}
-	for _, v := range vars {
-		values = append(values, reflect.ValueOf(v))
-	}
-	result := reflect.ValueOf(&builtin).MethodByName(cmd).Call(values)
-	val = result[0].Interface().(Value)
-	err, _ = result[1].Interface().(error)
-	return
 }
 
 func (Builtin) Display(vars ...Value) (Value, error) {

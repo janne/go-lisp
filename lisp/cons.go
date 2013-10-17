@@ -1,6 +1,7 @@
 package lisp
 
 import (
+	"reflect"
 	"fmt"
 	"strings"
 )
@@ -69,4 +70,132 @@ func (c Cons) String() string {
 		arr = append(arr, v.String())
 	}
 	return fmt.Sprintf(`(%v)`, strings.Join(arr, " "))
+}
+
+func (cons Cons) procForm() (val Value, err error) {
+	if val, err = cons.car.Eval(); err == nil {
+		if val.typ == procValue {
+			var args Vector
+			if args, err = cons.cdr.Cons().Map(func(v Value) (Value, error) {
+				return v.Eval()
+			}); err != nil {
+				return
+			} else {
+				val, err = val.val.(Proc).Call(args)
+			}
+		} else {
+			err = fmt.Errorf("The object %v is not applicable", val)
+		}
+	}
+	return
+}
+
+func (cons Cons) beginForm() (val Value, err error) {
+	return cons.cdr.Cons().Eval()
+}
+
+func (cons Cons) setForm() (val Value, err error) {
+	expr := cons.Vector()
+	if len(expr) == 3 {
+		key := expr[1].String()
+		if _, ok := scope.Get(key); ok {
+			val, err = expr[2].Eval()
+			if err == nil {
+				scope.Set(key, val)
+			}
+		} else {
+			err = fmt.Errorf("Unbound variable: %v", key)
+		}
+	} else {
+		err = fmt.Errorf("Ill-formed special form: %v", cons)
+	}
+	return
+}
+
+func (cons Cons) ifForm() (val Value, err error) {
+	expr := cons.Vector()
+	val = Nil
+	if len(expr) < 3 || len(expr) > 4 {
+		err = fmt.Errorf("Ill-formed special form: %v", expr)
+	} else {
+		r, err := expr[1].Eval()
+		if err == nil {
+			if !(r.typ == symbolValue && r.String() == "false") && r != Nil && len(expr) > 2 {
+				val, err = expr[2].Eval()
+			} else if len(expr) == 4 {
+				val, err = expr[3].Eval()
+			}
+		}
+	}
+	return
+}
+
+func (cons Cons) lambdaForm() (val Value, err error) {
+	if cons.cdr.typ == consValue {
+		lambda := cons.cdr.Cons()
+		if (lambda.car.typ == consValue || lambda.car.typ == nilValue) && lambda.cdr.typ == consValue {
+			params := lambda.car.Cons().Vector()
+			val = Value{procValue, Proc{params, lambda.cdr.Cons(), scope.Dup()}}
+		} else {
+			err = fmt.Errorf("Ill-formed special form: %v", cons)
+		}
+	} else {
+		err = fmt.Errorf("Ill-formed special form: %v", cons)
+	}
+	return
+}
+
+func (cons Cons) quoteForm() (val Value, err error) {
+	if cons.cdr != nil {
+		if *cons.cdr.Cons().cdr == Nil {
+			val = *cons.cdr.Cons().car
+		} else {
+			val = Value{consValue, cons}
+		}
+	} else {
+		err = fmt.Errorf("Ill-formed special form: %v", cons)
+	}
+	return
+}
+
+func (cons Cons) defineForm() (val Value, err error) {
+	expr := cons.Vector()
+	if len(expr) >= 2 && len(expr) <= 3 {
+		if expr[1].typ == symbolValue {
+			key := expr[1].String()
+			if len(expr) == 3 {
+				var i Value
+				if i, err = expr[2].Eval(); err == nil {
+					scope.Create(key, i)
+				}
+			} else {
+				scope.Create(key, Nil)
+			}
+			return expr[1], err
+		}
+	}
+	return Nil, fmt.Errorf("Ill-formed special form: %v", expr)
+}
+
+func (cons Cons) isBuiltin() bool {
+	s := cons.car.String()
+	if _, ok := builtin_commands[s]; ok {
+		return true
+	}
+	return false
+}
+
+func (cons Cons) runBuiltin() (val Value, err error) {
+	cmd := builtin_commands[cons.car.String()]
+	vars, err := cons.cdr.Cons().Map(func (v Value) (Value, error) {
+		return v.Eval()
+	})
+	values := []reflect.Value{}
+	for _, v := range vars {
+		values = append(values, reflect.ValueOf(v))
+	}
+	result := reflect.ValueOf(&builtin).MethodByName(cmd).Call(values)
+	val = result[0].Interface().(Value)
+	err, _ = result[1].Interface().(error)
+	return
 }
