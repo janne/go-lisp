@@ -91,12 +91,23 @@ func (c Cons) Vector() Vector {
 }
 
 func (c Cons) String() string {
-	arr := []string{}
-	for _, v := range c.Vector() {
-		arr = append(arr, v.String())
-	}
-	return fmt.Sprintf(`(%v)`, strings.Join(arr, " "))
+	s := strings.Join(c.Stringify(), " ")
+	return fmt.Sprintf(`(%v)`, s)
 }
+
+func (c Cons) Stringify() []string {
+	result := make([]string, 0)
+	result = append(result, c.car.String())
+	switch c.cdr.typ {
+	case nilValue:
+	case consValue:
+		result = append(result, c.cdr.Cons().Stringify()...)
+	default:
+		result = append(result, ".", c.cdr.String())
+	}
+	return result
+}
+
 
 func (cons Cons) procForm() (val Value, err error) {
 	if val, err = cons.car.Eval(); err == nil {

@@ -15,11 +15,22 @@ var builtin_commands = map[string]string{
 	">=":      "Gte",
 	"<=":      "Lte",
 	"display": "Display",
+	"cons":    "Cons",
 }
 
 func (Builtin) Display(vars ...Value) (Value, error) {
 	if len(vars) == 1 {
 		fmt.Println(vars[0])
+	} else {
+		return Nil, fmt.Errorf("Badly formatted arguments: %v", vars)
+	}
+	return Nil, nil
+}
+
+func (Builtin) Cons(vars ...Value) (Value, error) {
+	if len(vars) == 2 {
+		cons := Cons{&vars[0], &vars[1]}
+		return Value{consValue, cons}, nil
 	} else {
 		return Nil, fmt.Errorf("Badly formatted arguments: %v", vars)
 	}
