@@ -56,7 +56,7 @@ func evalValue(input Value) (val Value, err error) {
 				return procForm(cons)
 			}
 		}
-	case numberValue, stringValue, sexpValue, nilValue:
+	case numberValue, stringValue, vectorValue, nilValue:
 		val = input
 	case symbolValue:
 		sym := input.String()
@@ -76,7 +76,7 @@ func evalValue(input Value) (val Value, err error) {
 func procForm(cons Cons) (val Value, err error) {
 	if val, err = evalValue(*cons.car); err == nil {
 		if val.typ == procValue {
-			var args Sexp
+			var args Vector
 			if args, err = cons.cdr.Cons().Map(func(v Value) (Value, error) {
 				return evalValue(v)
 			}); err != nil {
@@ -96,7 +96,7 @@ func beginForm(cons Cons) (val Value, err error) {
 }
 
 func setForm(cons Cons) (val Value, err error) {
-	expr := cons.Sexp()
+	expr := cons.Vector()
 	if len(expr) == 3 {
 		key := expr[1].String()
 		if _, ok := scope.Get(key); ok {
@@ -114,7 +114,7 @@ func setForm(cons Cons) (val Value, err error) {
 }
 
 func ifForm(cons Cons) (val Value, err error) {
-	expr := cons.Sexp()
+	expr := cons.Vector()
 	val = Nil
 	if len(expr) < 3 || len(expr) > 4 {
 		err = fmt.Errorf("Ill-formed special form: %v", expr)
@@ -135,7 +135,7 @@ func lambdaForm(cons Cons) (val Value, err error) {
 	if cons.cdr.typ == consValue {
 		lambda := cons.cdr.Cons()
 		if (lambda.car.typ == consValue || lambda.car.typ == nilValue) && lambda.cdr.typ == consValue {
-			params := lambda.car.Cons().Sexp()
+			params := lambda.car.Cons().Vector()
 			val = Value{procValue, Proc{params, lambda.cdr.Cons(), scope.Dup()}}
 		} else {
 			err = fmt.Errorf("Ill-formed special form: %v", cons)
@@ -160,7 +160,7 @@ func quoteForm(cons Cons) (val Value, err error) {
 }
 
 func defineForm(cons Cons) (val Value, err error) {
-	expr := cons.Sexp()
+	expr := cons.Vector()
 	if len(expr) >= 2 && len(expr) <= 3 {
 		if expr[1].typ == symbolValue {
 			key := expr[1].String()

@@ -5,9 +5,9 @@ import (
 	"strings"
 )
 
-type Sexp []Value
+type Vector []Value
 
-func (s Sexp) String() string {
+func (s Vector) String() string {
 	var arr []string
 	for _, v := range s {
 		arr = append(arr, v.String())
@@ -15,7 +15,7 @@ func (s Sexp) String() string {
 	return fmt.Sprintf(`[%v]`, strings.Join(arr, " "))
 }
 
-func (s Sexp) Inspect() string {
+func (s Vector) Inspect() string {
 	var arr []string
 	for _, v := range s {
 		arr = append(arr, v.Inspect())

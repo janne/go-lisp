@@ -3,7 +3,7 @@ package lisp
 import "fmt"
 
 type Proc struct {
-	params Sexp
+	params Vector
 	body   Cons
 	scope  *Scope
 }
@@ -12,7 +12,7 @@ func (p Proc) String() string {
 	return "<Procedure>"
 }
 
-func (p Proc) Call(params Sexp) (val Value, err error) {
+func (p Proc) Call(params Vector) (val Value, err error) {
 	if len(p.params) == len(params) {
 		old_scope := scope
 		scope = p.scope

@@ -29,8 +29,8 @@ func TestConsLen(t *testing.T) {
 	}
 }
 
-func TestConsSexp(t *testing.T) {
-	s := cons().Sexp()
+func TestConsVector(t *testing.T) {
+	s := cons().Vector()
 	if len(s) != 3 || s[0].val != 1.0 || s[1].val != 2.0 || s[2].val != 3.0 {
 		t.Errorf("Expected (1 2 3), got %v", s)
 	}

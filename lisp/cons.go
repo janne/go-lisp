@@ -42,7 +42,7 @@ func (c Cons) Len() int {
 	return l
 }
 
-func (c Cons) Sexp() Sexp {
+func (c Cons) Vector() Vector {
 	v, _ := c.Map(func (v Value) (Value, error) {
 		return v, nil
 	})
@@ -51,7 +51,7 @@ func (c Cons) Sexp() Sexp {
 
 func (c Cons) String() string {
 	arr := []string{}
-	for _, v := range c.Sexp() {
+	for _, v := range c.Vector() {
 		arr = append(arr, v.String())
 	}
 	return fmt.Sprintf(`(%v)`, strings.Join(arr, " "))

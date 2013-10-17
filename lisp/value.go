@@ -22,7 +22,7 @@ const (
 	symbolValue
 	numberValue
 	stringValue
-	sexpValue
+	vectorValue
 	procValue
 	consValue
 )
@@ -42,8 +42,8 @@ func (v Value) Inspect() string {
 	switch v.typ {
 	case stringValue:
 		return fmt.Sprintf(`"%v"`, v.val)
-	case sexpValue:
-		return v.val.(Sexp).Inspect()
+	case vectorValue:
+		return v.val.(Vector).Inspect()
 	default:
 		return v.String()
 	}
@@ -57,8 +57,8 @@ func (v Value) Cons() Cons {
 	}
 }
 
-func (v Value) Sexp() Sexp {
-	return v.val.(Sexp)
+func (v Value) Vector() Vector {
+	return v.val.(Vector)
 }
 
 func (v Value) Proc() Proc {
