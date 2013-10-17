@@ -1,7 +1,11 @@
 package lisp
 
 func EvalString(line string) (Value, error) {
-	parsed, err := NewTokens(line).Parse()
+	expanded, err := NewTokens(line).Expand()
+	if err != nil {
+		return Nil, err
+	}
+	parsed, err := expanded.Parse()
 	if err != nil {
 		return Nil, err
 	}

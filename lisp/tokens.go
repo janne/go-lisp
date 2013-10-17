@@ -93,7 +93,6 @@ func (tokens Tokens) Expand() (result Tokens, err error) {
 }
 
 func (tokens Tokens) Parse() (cons Cons, err error) {
-	tokens, err = tokens.Expand()
 	var pos int
 	var current *Cons
 	for pos < len(tokens) {
