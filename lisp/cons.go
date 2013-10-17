@@ -10,6 +10,20 @@ type Cons struct {
 	cdr *Value
 }
 
+func (c Cons) Eval() (val Value, err error) {
+	if c.List() {
+		if v, err := evalValue(*c.car); err != nil {
+			return Nil, err
+		} else if *c.cdr == Nil {
+			return v, nil
+		} else {
+			return c.cdr.Cons().Eval()
+		}
+	} else {
+		return Value{consValue, c}, nil
+	}
+}
+
 func (c Cons) List() bool {
 	return c.cdr.typ == consValue || c.cdr.typ == nilValue
 }

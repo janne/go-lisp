@@ -7,26 +7,12 @@ func EvalString(line string) (Value, error) {
 	if err != nil {
 		return Nil, err
 	}
-	evaled, err := Eval(parsed)
+	evaled, err := parsed.Eval()
 	if err != nil {
 		return Nil, err
 	}
 	scope.Create("_", evaled)
 	return evaled, nil
-}
-
-func Eval(cons Cons) (val Value, err error) {
-	if cons.List() {
-		if v, err := evalValue(*cons.car); err != nil {
-			return Nil, err
-		} else if *cons.cdr == Nil {
-			return v, nil
-		} else {
-			return Eval(cons.cdr.Cons())
-		}
-	} else {
-		return Value{consValue, cons}, nil
-	}
 }
 
 func evalValue(input Value) (val Value, err error) {
@@ -92,7 +78,7 @@ func procForm(cons Cons) (val Value, err error) {
 }
 
 func beginForm(cons Cons) (val Value, err error) {
-	return Eval(cons.cdr.Cons())
+	return cons.cdr.Cons().Eval()
 }
 
 func setForm(cons Cons) (val Value, err error) {

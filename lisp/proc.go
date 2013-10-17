@@ -20,7 +20,7 @@ func (p Proc) Call(params Vector) (val Value, err error) {
 		for i, name := range p.params {
 			scope.Create(name.String(), params[i])
 		}
-		val, err = Eval(p.body)
+		val, err = p.body.Eval()
 		scope.DropEnv()
 		scope = old_scope
 	} else {
