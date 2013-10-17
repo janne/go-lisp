@@ -1,8 +1,8 @@
 package lisp
 
 import (
-	"reflect"
 	"fmt"
+	"reflect"
 	"strings"
 )
 
@@ -55,7 +55,7 @@ func (c Cons) List() bool {
 	return c.cdr.typ == consValue || c.cdr.typ == nilValue
 }
 
-func (c Cons) Map(f func (v Value) (Value, error)) ([]Value, error) {
+func (c Cons) Map(f func(v Value) (Value, error)) ([]Value, error) {
 	result := make([]Value, 0)
 	if value, err := f(*c.car); err != nil {
 		return nil, err
@@ -84,7 +84,7 @@ func (c Cons) Len() int {
 }
 
 func (c Cons) Vector() Vector {
-	v, _ := c.Map(func (v Value) (Value, error) {
+	v, _ := c.Map(func(v Value) (Value, error) {
 		return v, nil
 	})
 	return v
@@ -213,7 +213,7 @@ func (cons Cons) isBuiltin() bool {
 
 func (cons Cons) runBuiltin() (val Value, err error) {
 	cmd := builtin_commands[cons.car.String()]
-	vars, err := cons.cdr.Cons().Map(func (v Value) (Value, error) {
+	vars, err := cons.cdr.Cons().Map(func(v Value) (Value, error) {
 		return v.Eval()
 	})
 	values := []reflect.Value{}
