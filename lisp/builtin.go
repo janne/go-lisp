@@ -29,7 +29,7 @@ func isBuiltin(cons Cons) bool {
 func runBuiltin(cons Cons) (val Value, err error) {
 	cmd := builtin_commands[cons.car.String()]
 	vars, err := cons.cdr.Cons().Map(func (v Value) (Value, error) {
-		return evalValue(v)
+		return v.Eval()
 	})
 	values := []reflect.Value{}
 	for _, v := range vars {

@@ -12,7 +12,7 @@ type Cons struct {
 
 func (c Cons) Eval() (val Value, err error) {
 	if c.List() {
-		if v, err := evalValue(*c.car); err != nil {
+		if v, err := c.car.Eval(); err != nil {
 			return Nil, err
 		} else if *c.cdr == Nil {
 			return v, nil
