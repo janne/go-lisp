@@ -25,6 +25,32 @@ func (c Cons) Eval() (val Value, err error) {
 	}
 }
 
+func (cons Cons) Execute() (Value, error) {
+	if !cons.List() {
+		return Nil, fmt.Errorf("Combination must be a proper list: %v", cons)
+	}
+	switch cons.car.String() {
+	case "quote":
+		return cons.quoteForm()
+	case "if":
+		return cons.ifForm()
+	case "set!":
+		return cons.setForm()
+	case "define":
+		return cons.defineForm()
+	case "lambda":
+		return cons.lambdaForm()
+	case "begin":
+		return cons.beginForm()
+	default:
+		if cons.isBuiltin() {
+			return cons.runBuiltin()
+		} else {
+			return cons.procForm()
+		}
+	}
+}
+
 func (c Cons) List() bool {
 	return c.cdr.typ == consValue || c.cdr.typ == nilValue
 }

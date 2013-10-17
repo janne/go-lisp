@@ -26,48 +26,22 @@ const (
 	consValue
 )
 
-func (v Value) Eval() (val Value, err error) {
+func (v Value) Eval() (Value, error) {
 	switch v.typ {
 	case consValue:
-		cons := v.Cons()
-		if !cons.List() {
-			return Nil, fmt.Errorf("Combination must be a proper list: %v", cons)
-		}
-		switch cons.car.String() {
-		case "quote":
-			return cons.quoteForm()
-		case "if":
-			return cons.ifForm()
-		case "set!":
-			return cons.setForm()
-		case "define":
-			return cons.defineForm()
-		case "lambda":
-			return cons.lambdaForm()
-		case "begin":
-			return cons.beginForm()
-		default:
-			if cons.isBuiltin() {
-				return cons.runBuiltin()
-			} else {
-				return cons.procForm()
-			}
-		}
-	case numberValue, stringValue, vectorValue, nilValue:
-		val = v
+		return v.Cons().Execute()
 	case symbolValue:
 		sym := v.String()
 		if v, ok := scope.Get(sym); ok {
-			val = v
+			return v, nil
 		} else if sym == "true" || sym == "false" {
-			val = Value{symbolValue, sym}
+			return Value{symbolValue, sym}, nil
 		} else {
 			return Nil, fmt.Errorf("Unbound variable: %v", sym)
 		}
 	default:
-		return Nil, fmt.Errorf("Unknown data type: %v", v)
+		return v, nil
 	}
-	return
 }
 
 func (v Value) String() string {
