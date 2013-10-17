@@ -17,8 +17,7 @@ var True = Value{symbolValue, "true"}
 type valueType uint8
 
 const (
-	invalidValue valueType = iota
-	nilValue
+	nilValue valueType = iota
 	symbolValue
 	numberValue
 	stringValue
@@ -55,14 +54,6 @@ func (v Value) Cons() Cons {
 	} else {
 		return Cons{&v, &Nil}
 	}
-}
-
-func (v Value) Vector() Vector {
-	return v.val.(Vector)
-}
-
-func (v Value) Proc() Proc {
-	return v.val.(Proc)
 }
 
 func (v Value) Number() float64 {

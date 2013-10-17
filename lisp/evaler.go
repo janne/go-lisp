@@ -82,7 +82,7 @@ func procForm(cons Cons) (val Value, err error) {
 			}); err != nil {
 				return
 			} else {
-				val, err = val.Proc().Call(args)
+				val, err = val.val.(Proc).Call(args)
 			}
 		} else {
 			err = fmt.Errorf("The object %v is not applicable", val)
