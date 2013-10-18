@@ -30,7 +30,7 @@ func (Builtin) Display(vars ...Value) (Value, error) {
 func (Builtin) Cons(vars ...Value) (Value, error) {
 	if len(vars) == 2 {
 		cons := Cons{&vars[0], &vars[1]}
-		return Value{consValue, cons}, nil
+		return Value{consValue, &cons}, nil
 	} else {
 		return Nil, fmt.Errorf("Badly formatted arguments: %v", vars)
 	}
