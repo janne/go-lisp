@@ -6,6 +6,14 @@ func num(i float64) Value {
 	return Value{numberValue, i}
 }
 
+func TestCar(t *testing.T) {
+	a, b := Value{stringValue, "a"}, Value{stringValue, "b"}
+	cons := Value{consValue, &Cons{&a, &b}}
+	if response, err := builtin.Car(cons); response != a || err != nil {
+		t.Errorf("Car %v should be %v, was %v", cons, a, response)
+	}
+}
+
 func TestAdd(t *testing.T) {
 	cons := Cons{&Value{symbolValue, "+"}, nil}
 	if !cons.isBuiltin() {

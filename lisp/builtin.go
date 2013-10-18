@@ -16,6 +16,7 @@ var builtin_commands = map[string]string{
 	"<=":      "Lte",
 	"display": "Display",
 	"cons":    "Cons",
+	"car":     "Car",
 }
 
 func (Builtin) Display(vars ...Value) (Value, error) {
@@ -31,6 +32,15 @@ func (Builtin) Cons(vars ...Value) (Value, error) {
 	if len(vars) == 2 {
 		cons := Cons{&vars[0], &vars[1]}
 		return Value{consValue, &cons}, nil
+	} else {
+		return Nil, fmt.Errorf("Badly formatted arguments: %v", vars)
+	}
+}
+
+func (Builtin) Car(vars ...Value) (Value, error) {
+	if len(vars) == 1 && vars[0].typ == consValue {
+		cons := vars[0].Cons()
+		return *cons.car, nil
 	} else {
 		return Nil, fmt.Errorf("Badly formatted arguments: %v", vars)
 	}
