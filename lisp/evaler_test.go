@@ -21,6 +21,7 @@ func TestEval(t *testing.T) {
 		{"(quote hej)", "hej"},
 		{"(cons 1 2)", "(1 . 2)"},
 		{"(car (cons 1 2))", "1"},
+		{"(cdr (cons 1 2))", "2"},
 		{"(cons 1 ())", "(1)"},
 		{"(cons 1 '(2))", "(1 2)"},
 		{"'hej", "hej"},

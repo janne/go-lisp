@@ -14,6 +14,14 @@ func TestCar(t *testing.T) {
 	}
 }
 
+func TestCdr(t *testing.T) {
+	a, b := Value{stringValue, "a"}, Value{stringValue, "b"}
+	cons := Value{consValue, &Cons{&a, &b}}
+	if response, err := builtin.Cdr(cons); response != b || err != nil {
+		t.Errorf("Cdr %v should be %v, was %v", cons, b, response)
+	}
+}
+
 func TestAdd(t *testing.T) {
 	cons := Cons{&Value{symbolValue, "+"}, nil}
 	if !cons.isBuiltin() {
