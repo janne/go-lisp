@@ -108,7 +108,6 @@ func (c Cons) Stringify() []string {
 	return result
 }
 
-
 func (cons Cons) procForm() (val Value, err error) {
 	if val, err = cons.car.Eval(); err == nil {
 		if val.typ == procValue {

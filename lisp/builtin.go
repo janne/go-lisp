@@ -34,7 +34,6 @@ func (Builtin) Cons(vars ...Value) (Value, error) {
 	} else {
 		return Nil, fmt.Errorf("Badly formatted arguments: %v", vars)
 	}
-	return Nil, nil
 }
 
 func (Builtin) Add(vars ...Value) (Value, error) {
