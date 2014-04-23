@@ -7,17 +7,18 @@ type Builtin struct{}
 var builtin = Builtin{}
 
 var builtin_commands = map[string]string{
-	"+":       "Add",
-	"-":       "Sub",
-	"*":       "Mul",
-	">":       "Gt",
-	"<":       "Lt",
-	">=":      "Gte",
-	"<=":      "Lte",
-	"display": "Display",
-	"cons":    "Cons",
-	"car":     "Car",
-	"cdr":     "Cdr",
+	"+":             "Add",
+	"-":             "Sub",
+	"*":             "Mul",
+	">":             "Gt",
+	"<":             "Lt",
+	">=":            "Gte",
+	"<=":            "Lte",
+	"display":       "Display",
+	"cons":          "Cons",
+	"car":           "Car",
+	"cdr":           "Cdr",
+	"string-append": "StringAppend",
 }
 
 func (Builtin) Display(vars ...Value) (Value, error) {
@@ -148,4 +149,17 @@ func (Builtin) Lte(vars ...Value) (Value, error) {
 		}
 	}
 	return True, nil
+}
+
+func (Builtin) StringAppend(vars ...Value) (Value, error) {
+	result := ""
+	for i := 0; i < len(vars); i++ {
+		v := vars[i]
+		if v.typ != stringValue {
+			return Nil, fmt.Errorf("Badly formatted arguments: %v", vars)
+		} else {
+			result = result + v.String()
+		}
+	}
+	return Value{stringValue, result}, nil
 }

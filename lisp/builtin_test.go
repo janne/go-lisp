@@ -6,6 +6,10 @@ func num(i float64) Value {
 	return Value{numberValue, i}
 }
 
+func str(s string) Value {
+	return Value{stringValue, s}
+}
+
 func TestCar(t *testing.T) {
 	a, b := Value{stringValue, "a"}, Value{stringValue, "b"}
 	cons := Value{consValue, &Cons{&a, &b}}
@@ -70,5 +74,11 @@ func TestGte(t *testing.T) {
 func TestLte(t *testing.T) {
 	if result, err := builtin.Lte(num(2), num(2), num(4)); result == False || err != nil {
 		t.Errorf("2 <= 2 <= 4 should == true, is %v, error: %v", result, err)
+	}
+}
+
+func TestStringAppend(t *testing.T) {
+	if result, err := builtin.StringAppend(str("foo"), str("bar"), str("baz")); result != str("foobarbaz") || err != nil {
+		t.Errorf("string-append foo bar baz should be foobarbaz, is %v, error: %v", result, err)
 	}
 }
