@@ -58,7 +58,7 @@ func (Builtin) Cdr(vars ...Value) (Value, error) {
 }
 
 func (Builtin) Add(vars ...Value) (Value, error) {
-	var sum float64
+	sum := 0.0
 	for _, v := range vars {
 		if v.typ == numberValue {
 			sum += v.Number()
@@ -70,7 +70,7 @@ func (Builtin) Add(vars ...Value) (Value, error) {
 }
 
 func (Builtin) Sub(vars ...Value) (Value, error) {
-	if vars[0].typ != numberValue {
+	if len(vars) == 0 || vars[0].typ != numberValue {
 		return Nil, fmt.Errorf("Badly formatted arguments: %v", vars)
 	}
 	sum := vars[0].Number()
@@ -85,6 +85,9 @@ func (Builtin) Sub(vars ...Value) (Value, error) {
 }
 
 func (Builtin) Mul(vars ...Value) (Value, error) {
+	if len(vars) == 0 {
+		return Value{numberValue, 1.0}, nil
+	}
 	if vars[0].typ != numberValue {
 		return Nil, fmt.Errorf("Badly formatted arguments: %v", vars)
 	}
@@ -100,6 +103,9 @@ func (Builtin) Mul(vars ...Value) (Value, error) {
 }
 
 func (Builtin) Gt(vars ...Value) (Value, error) {
+	if len(vars) == 0 {
+		return Nil, fmt.Errorf("Badly formatted arguments: %v", vars)
+	}
 	for i := 1; i < len(vars); i++ {
 		v1 := vars[i-1]
 		v2 := vars[i]
@@ -113,6 +119,9 @@ func (Builtin) Gt(vars ...Value) (Value, error) {
 }
 
 func (Builtin) Lt(vars ...Value) (Value, error) {
+	if len(vars) == 0 {
+		return Nil, fmt.Errorf("Badly formatted arguments: %v", vars)
+	}
 	for i := 1; i < len(vars); i++ {
 		v1 := vars[i-1]
 		v2 := vars[i]
@@ -126,6 +135,9 @@ func (Builtin) Lt(vars ...Value) (Value, error) {
 }
 
 func (Builtin) Gte(vars ...Value) (Value, error) {
+	if len(vars) == 0 {
+		return Nil, fmt.Errorf("Badly formatted arguments: %v", vars)
+	}
 	for i := 1; i < len(vars); i++ {
 		v1 := vars[i-1]
 		v2 := vars[i]
@@ -139,6 +151,9 @@ func (Builtin) Gte(vars ...Value) (Value, error) {
 }
 
 func (Builtin) Lte(vars ...Value) (Value, error) {
+	if len(vars) == 0 {
+		return Nil, fmt.Errorf("Badly formatted arguments: %v", vars)
+	}
 	for i := 1; i < len(vars); i++ {
 		v1 := vars[i-1]
 		v2 := vars[i]
