@@ -81,4 +81,7 @@ func TestStringAppend(t *testing.T) {
 	if result, err := builtin.StringAppend(str("foo"), str("bar"), str("baz")); result != str("foobarbaz") || err != nil {
 		t.Errorf("string-append foo bar baz should be foobarbaz, is %v, error: %v", result, err)
 	}
+	if result, err := builtin.StringAppend(); result != str("") || err != nil {
+		t.Errorf("string-append with no args should be empty string, is %v, error: %v", result, err)
+	}
 }

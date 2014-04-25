@@ -43,3 +43,12 @@ func TestConsString(t *testing.T) {
 		t.Errorf("Cons.String() failed. Expected %v, got %v", expected, s)
 	}
 }
+
+func TestBuiltinExecute(t *testing.T) {
+	// call to "+" builtin with no arguments
+	c := &Cons{&Value{symbolValue, "+"}, &Value{nilValue, nil}}
+	_, err := c.Execute()
+	if err != nil {
+		t.Errorf("Cons.Execute() failed for no-arguments builtin: %v", err)
+	}
+}
