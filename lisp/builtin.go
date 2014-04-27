@@ -18,6 +18,8 @@ var builtin_commands = map[string]string{
 	"cons":          "Cons",
 	"car":           "Car",
 	"cdr":           "Cdr",
+	"string?":       "StringHuh",
+	"string-length": "StringLength",
 	"string-append": "StringAppend",
 }
 
@@ -164,6 +166,23 @@ func (Builtin) Lte(vars ...Value) (Value, error) {
 		}
 	}
 	return True, nil
+}
+
+func (Builtin) StringHuh(vars ...Value) (Value, error) {
+	if len(vars) != 1 {
+		return Nil, fmt.Errorf("Badly formatted arguments: %v", vars)
+	}
+	if vars[0].typ == stringValue {
+		return True, nil
+	}
+	return False, nil
+}
+
+func (Builtin) StringLength(vars ...Value) (Value, error) {
+	if len(vars) != 1 {
+		return Nil, fmt.Errorf("Badly formatted arguments: %v", vars)
+	}
+	return Value{numberValue, float64(len(vars[0].String()))}, nil
 }
 
 func (Builtin) StringAppend(vars ...Value) (Value, error) {

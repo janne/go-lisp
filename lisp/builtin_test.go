@@ -104,6 +104,27 @@ func TestLte(t *testing.T) {
 	}
 }
 
+func TestStringHuh(t *testing.T) {
+	if result, err := builtin.StringHuh(str("foo")); result != True || err != nil {
+		t.Errorf("string? foo should be true, is %v, error: %v", result, err)
+	}
+	if result, err := builtin.StringHuh(num(12)); result != False || err != nil {
+		t.Errorf("string? 12 should be false, is %v, error: %v", result, err)
+	}
+	if result, err := builtin.StringHuh(); err == nil {
+		t.Errorf("string? with no args should return error, is %v, error: %v", result, err)
+	}
+}
+
+func TestStringLength(t *testing.T) {
+	if result, err := builtin.StringLength(str("foo")); result != num(3) || err != nil {
+		t.Errorf("string-length foo should be 3, is %v, error: %v", result, err)
+	}
+	if result, err := builtin.StringLength(); err == nil {
+		t.Errorf("string-length with no args should return error, is %v, error: %v", result, err)
+	}
+}
+
 func TestStringAppend(t *testing.T) {
 	if result, err := builtin.StringAppend(str("foo"), str("bar"), str("baz")); result != str("foobarbaz") || err != nil {
 		t.Errorf("string-append foo bar baz should be foobarbaz, is %v, error: %v", result, err)
