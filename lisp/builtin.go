@@ -179,7 +179,7 @@ func (Builtin) StringHuh(vars ...Value) (Value, error) {
 }
 
 func (Builtin) StringLength(vars ...Value) (Value, error) {
-	if len(vars) != 1 {
+	if len(vars) != 1 || vars[0].typ != stringValue {
 		return Nil, fmt.Errorf("Badly formatted arguments: %v", vars)
 	}
 	return Value{numberValue, float64(len(vars[0].String()))}, nil

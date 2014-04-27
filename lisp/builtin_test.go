@@ -123,6 +123,9 @@ func TestStringLength(t *testing.T) {
 	if result, err := builtin.StringLength(); err == nil {
 		t.Errorf("string-length with no args should return error, is %v, error: %v", result, err)
 	}
+	if result, err := builtin.StringLength(num(12)); err == nil {
+		t.Errorf("string-length with non-string should return error, is %v, error: %v", result, err)
+	}
 }
 
 func TestStringAppend(t *testing.T) {
@@ -131,5 +134,8 @@ func TestStringAppend(t *testing.T) {
 	}
 	if result, err := builtin.StringAppend(); result != str("") || err != nil {
 		t.Errorf("string-append with no args should be empty string, is %v, error: %v", result, err)
+	}
+	if result, err := builtin.StringAppend(num(12)); err == nil {
+		t.Errorf("string-append with non-string should return error, is %v, error: %v", result, err)
 	}
 }
