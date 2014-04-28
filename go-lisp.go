@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
-	"github.com/apeace/go-lisp/lisp"
+	"github.com/janne/go-lisp/lisp"
 	"io/ioutil"
 	"os"
 	"strings"
