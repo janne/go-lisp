@@ -116,6 +116,24 @@ func TestStringHuh(t *testing.T) {
 	}
 }
 
+func TestStringEqualHuh(t *testing.T) {
+	if result, err := builtin.StringEqualHuh(str("foo"), str("foo")); result != True || err != nil {
+		t.Errorf("string=? foo foo should be true, is %v, error: %v", result, err)
+	}
+	if result, err := builtin.StringEqualHuh(str("foo"), str("bar")); result != False || err != nil {
+		t.Errorf("string=? foo bar should be false, is %v, error: %v", result, err)
+	}
+	if result, err := builtin.StringEqualHuh(str("foo"), num(12)); err == nil {
+		t.Errorf("string? 12 foo should return error, is %v, error: %v", result, err)
+	}
+	if result, err := builtin.StringEqualHuh(); err == nil {
+		t.Errorf("string? with no args should return error, is %v, error: %v", result, err)
+	}
+	if result, err := builtin.StringEqualHuh(str("foo")); err == nil {
+		t.Errorf("string? with one arg should return error, is %v, error: %v", result, err)
+	}
+}
+
 func TestStringLength(t *testing.T) {
 	if result, err := builtin.StringLength(str("foo")); result != num(3) || err != nil {
 		t.Errorf("string-length foo should be 3, is %v, error: %v", result, err)

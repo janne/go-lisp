@@ -19,6 +19,7 @@ var builtin_commands = map[string]string{
 	"car":           "Car",
 	"cdr":           "Cdr",
 	"string?":       "StringHuh",
+	"string=?":      "StringEqualHuh",
 	"string-length": "StringLength",
 	"string-append": "StringAppend",
 }
@@ -176,6 +177,22 @@ func (Builtin) StringHuh(vars ...Value) (Value, error) {
 		return True, nil
 	}
 	return False, nil
+}
+
+func (Builtin) StringEqualHuh(vars ...Value) (Value, error) {
+	if len(vars) < 2 {
+		return Nil, fmt.Errorf("Badly formatted arguments: %v", vars)
+	}
+	for i := 1; i < len(vars); i++ {
+		v1 := vars[i-1]
+		v2 := vars[i]
+		if v1.typ != stringValue || v2.typ != stringValue {
+			return Nil, fmt.Errorf("Badly formatted arguments: %v", vars)
+		} else if v1.String() != v2.String() {
+			return False, nil
+		}
+	}
+	return True, nil
 }
 
 func (Builtin) StringLength(vars ...Value) (Value, error) {
