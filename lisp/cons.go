@@ -40,6 +40,8 @@ func (cons Cons) Execute() (Value, error) {
 		return cons.defineForm()
 	case "lambda":
 		return cons.lambdaForm()
+	case "λ":
+		return cons.lambdaForm()
 	case "begin":
 		return cons.beginForm()
 	default:
