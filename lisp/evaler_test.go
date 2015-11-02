@@ -39,11 +39,13 @@ func TestEval(t *testing.T) {
 		{"(begin (define p 3) (set! p (+ 1 1)) p)", "2"},
 		{"(begin (define pi (+ 3 14)) pi)", "17"},
 		{"((lambda (a) (+ a 1)) 42)", "43"},
+		{"((λ (a) (+ a 1)) 42)", "43"},
 		{"(begin (define p 10) p)", "10"},
 		{"(begin (define inc (lambda (a) (+ a 1))) (inc 42))", "43"},
 		{"(define a 10) ((lambda () (define a 20))) a", "10"},
 		{"(define a 0) ((lambda () (set! a 10))) a", "10"},
 		{"((lambda (i) i) (+ 5 5))", "10"},
+		{"((λ (i) i) (+ 5 5))", "10"},
 		{"(define inc ((lambda () (begin (define a 0) (lambda () (set! a (+ a 1))))))) (inc) (inc)", "2"},
 		{"(define fact (lambda (n) (if (<= n 1) 1 (* n (fact (- n 1)))))) (fact 20)", "2432902008176640000"},
 	}
