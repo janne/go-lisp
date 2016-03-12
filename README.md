@@ -8,7 +8,7 @@ garbage collected and fast. The result is a one file distribution, which makes
 it easy to deploy. The garbage collection unloads that work from the
 interpreter, using the Go already tuned GC.
 
-Inspired by: [http://norvig.com/lispy.html]()
+Inspired by: [http://norvig.com/lispy.html]
 
 Setup
 -----
