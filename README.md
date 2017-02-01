@@ -106,3 +106,7 @@ the procedure is called with the list of expressions as arguments.
 Returns:
 
     144
+
+License
+-------
+Licensed under [MIT license](https://github.com/janne/go-lisp/blob/master/LICENSE).
